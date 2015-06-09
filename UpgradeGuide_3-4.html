@@ -1,0 +1,416 @@
+<html>
+<style type="text/css" media="all">
+	PRE.file_text { VERTICAL-ALIGN: top; color:purple }
+</style>
+<title>Upgrade Guide for Oscailt 3.3 to 3.4 </title>
+<body>
+	<h1>Upgrade Guide for Oscailt 3.3 to 3.4 </h1>
+
+	<h2>1 Introduction</h2>
+	This page provides the instructions to install the Oscailt 3.4 release files and to upgrade from Oscailt 3.3 
+        to Oscailt 3.4.
+        <p>
+	<u>If you are upgrading from Oscailt 3.0, 3.1, 3.2 or 3.3 then you should first upgrade to each of the subsequent versions in turn and follow the upgrade guides for those releases.</u>
+	</p>
+	<p>There is a companion release of the Oscailt modified version of the Fabricio Zuardi XSPF Audio Player which
+	Oscailt is configured to generate the appropriate embedded HTML for use with MP3 audio files that are either
+        local to your hosting site or external to it. Please see the corresponding readme file for it.
+	</p>
+	<h3>1.1 Full Install </h3>
+	If this is a first time install, then the main install.php script can be executed and one should as part of 
+	that install, import the Full Indymedia Ireland template site, but first read the instructions in the 
+        README.txt file applicable to Oscailt 3.0.
+        </p><p>
+	If you are an Oscailt 2.x user, then regrettably there is no easy method to migrate from Oscailt 2.x to 
+        Oscailt 3.x. 
+        </p><p>
+	<h3>1.2 New Features Summary </h3>
+	This release introduces a number of new features which are fully listed in the release notes. In brief,
+	this release has expanded the photo gallery to generate an audio gallery and an embedded video gallery,
+        functionality for editors to add one line annotations to stories and comments visible by editors only,
+        new xml files allowing for at least 50% of the admin pages to be translated stories, color highlighting
+	of search words, a new table to enable bans based on hostname and browser, a mechanism to control which
+	embedded video types to auto cover images, a mechanism to help check entries in the story translation table,
+        a new feature added for spam word detection in publish, a basic html cache for the main pages to speed up
+	access and reduce load, updates to publish when editing, minor updates to the numeric captcha, a new feature
+	to allow primitive rule based fixes to incoming RSS feeds, new thumbnail mode in the image manager, a new 
+	feature to list object templates in the object viewer, a new admin screen for listing recent stories and 
+	attachments, a feature for editors to opt-in to receive new story title email notifications, a new feature to 
+        make inset objects date dependent which can be used to control when razorwires are displayed and
+	finally numerous other minor updates and bugfixes.
+
+	</p>
+
+        <h2>2. Backup </h2>
+	If you are already running a site with Oscailt, it is strongly recommended that you back your entire site 
+	first. You should backup the following:
+        <uL>
+        <li> Backup your database -i.e. mysql dump command
+	<li> Backup all your .PHP, .INC and .XML files. -Use Unix tar command
+        </ul>
+
+	<h2>3. Release - Upgrade Steps </h2>
+        This release has changes to the following:
+	<ol>
+		<li> PHP files
+		<li> Database Schema Changes
+		<li> Updating the Image Cache Structure
+		<li> Apache file .htaccess
+		<li> XML files
+		<li> Object updates
+		<li> Permisssion updates
+		<li> New configuration parameters
+		<li> Shared Memory
+		<li> Update of graphics files
+		<li> Update of Style Sheet Files 
+	</ol>
+	<p>
+        <h3>3.1 Updating the PHP Files </h3>
+	A significant number of the PHP and .INC files have been modified in some form for this release. If you have made your own localized modifications, then it would be best to carry out a difference and integrate in your changes.
+	<p>
+	If you have only made changes to the following <strong>configuration</strong> files:
+	<pre class="file_text">
+	html/config/systemconfig.php -Software version updated to 3.4 and new config for embedded video options.
+
+	html/objects/systemconfig.inc  -changed in this release.
+	html/objects/magpie/snoopy.inc -beware the existing file may have defined the path to 'curl' library.
+	</pre>
+	then <strong>save these and carefully transfer your settings to the new copies of these files</strong>.
+	<p>
+	<u><font color="#EC5050">Warning:</font></u> <b> Before you replace the PHP files, ensure that shared memory is disabled
+        in the main configuration screen in Oscailt, otherwise you may get server problems. Then after the files are
+        all copied over you can enable it again</b>. This is because some new shared memory variables have been 
+        added and it may corrupt the server memory if you do not disable it first.
+        </p><p>
+	If you have made no changes then simply replace each of the files in their respective directories. The
+	directories with PHP files are listed below and those with XML files are specifically indicated.
+	<pre class="file_text">
+        html/
+        html/config/
+        html/objects/
+	html/objects/feedexport/
+	html/objects/indyobjects/
+	html/objects/indyobjects/indydataclasses/
+        html/objects/indyruntime/
+        html/objects/magpie/
+        html/xmldata/                -contains XML files
+        html/xmldata/indydatatypes/  -contains XML files
+        html/xmldata/itemcache/
+	</pre>
+        The tools and upgrade directories are not part of the day to day running of the site.
+
+	<pre class="file_text">
+        tools/
+        upgrades/upgrade-3-01/
+        upgrades/upgrade-3-02/
+        upgrades/upgrade-3-03/
+        upgrades/upgrade-3-04/
+	</pre>
+        
+        <h3>3.2 Updating the Database Schema </h3>
+	For this release there are two new tables. They are a new banned_host_browser table and a new feed_rules table 
+        used for adding fixup rules to faulty incoming RSS or Atom feeds.
+        <p>
+	You need to check your MySQL user permissions so that the you can apply the table modifications. 
+	You can attempt to run the script <strong>dbupgrade-3-04.php</strong> by copying it <u>temporarily</u> to 
+	your <strong>html</strong> directory and updating your Apache <u>.htaccess</u> file to allow it. 
+	Alternatively or you can manually issue these commands in the MySql command line interface. Make sure that 
+	you modify the command accordingly if the prefix on the table name is different on your own site. In the 
+	example below, the prefix is the <strong>imc</strong> part in the table name. The prefix is set in the 
+        file <strong>html/config/dbconfig.php</strong>. 
+
+	<h4> 3.2.1 Checking Tables and Table Structure</h4>
+	To to check the list of existing tables and or to check whether your updates have worked, you can use 
+	these two MySQL commands at the MySQL command prompt.
+	<pre class="file_text">
+         show tables;
+         desc tablename ;
+	</pre>
+	There is also a tool available in the <strong>tools/</strong> directory which you should move only 
+	<u>temporarily</u> into the <strong>html/</strong> directory and will also require a temporary update to
+	the Apache .htaccess file. The script is called <strong>showtables.php</strong>. This will display the
+        list of table currently in your database and there is an option to display the table structure, indexes and
+	number of records.
+        <br>
+        <br>
+	<strong>Important:</strong> Remember to remove this script when you are finished.
+
+	<h4> 3.2.2 Create Tables </h4>
+	<i>It is assumed the variable $prefix is set to "imc". If not then change as appropriate below.</i>
+        <BR> <BR>
+	The commands to create the new database tables are:
+	<pre class="file_text">
+        CREATE TABLE banned_host_browser (
+            sub_hostname varchar(120) NOT NULL,
+	    browser_typ  varchar(160) NOT NULL,
+            ban_type     tinyint NOT NULL default 1,
+            time_limit   timestamp,
+            reason       text NOT NULL,
+            begin_ban    datetime NULL,
+	    PRIMARY KEY (sub_hostname, browser_type),
+            KEY          sub_hostname  (sub_hostname),
+            INDEX        time_limit  (time_limit)
+        );
+
+        CREATE TABLE FEED_RULES (
+            site_id      int(11) NOT NULL,
+            object_id    int(11) NOT NULL,
+	    rule_text    varchar(255),
+	    PRIMARY KEY (site_id, object_id),
+            INDEX        rule_key  (site_id, object_id)
+        );
+	</pre>
+        The table modifications in this release are:
+	<pre class="file_text">
+        ALTER TABLE imc_editors ADD COLUMN editor_options int(2) default 0;
+	</pre>
+
+	<strong>Note: Beware MySql column names may be case sensitive. Use lower case for names here. </strong>
+	<p>
+	Use DESC table-name to check the definition of any new tables.
+        <h4>3.2.3 Banned Host Browser </h4>
+	This table can be used for banning publisher based on their hostname and browser type. The use of the a ban
+	type also means that instead of a ban they can be put on automatic moderation where the post is automatically
+	hidden until reviewed.
+        <p>
+        <h4>3.2.4 Feed Rules </h4>
+	This table is used for storing simple rules that can be applied to certain incoming RSS or Atom feeds. These
+	rules are used to fix simple XML type errors such as extra leading blank lines. This feature is accessed for
+        the RSS management interface.
+        <p>
+
+	<h3>3.3 Updating the Image Cache Structure </h3>
+	For this release there has been a change to the image cache structure with the addition of a <b>video_images</b>
+	sub-directory. The clear cache admin screen with the clear image cache option can be used to create it
+        automatically.
+        <p>
+	The steps to do this are:
+	<ol>
+		<li> Login to Oscailt with full administration permissions.
+		<li> Go to the Clear Cache screen from the administration screen.
+		<li> Click on button labelled: <i>Check Image Cache Directories Exists and Create If Required</i> -This will create the new directories.
+	</ol>
+
+	<h3>3.4 Updating the Apache .htaccess File </h3>
+        The Apache .htaccess file needs to have the following update:
+        <ul>
+	<li> <strong>viewarticles.php</strong> -Add this if you will be using the new administrative View Articles tool.
+        </ul>
+        You may need to make similar changes for the upgrade script and showtables.php script if used and already
+        described above in section 3.2
+        <p>
+        On some servers this may or may not need a restart of the Apache Server.
+        <p>
+        <h3>3.5 Updating the XML Files </h3>
+	If you have <b>not</b> made any modifications to any of the XML files from the Oscailt 3.0 or 3.3, then you can
+	simply replace the existing XML files with the ones in the release, otherwise you should carefully compare
+        the differences. The directories with XML files are:
+	<pre class="file_text">
+	html/xmldata                (1 file updated)
+	html/xmldata                (15 new files)
+        html/xmldata/indydatatypes  (9 files updated)
+        </pre>
+	For the modified XML files, the main changes were:
+	<pre class="file_text">
+	universal_config_options.xml	-added option to display 'Edit Spam' settings and 'Dashboard' option.
+
+	article.xml	 -added text fields for embedded video hidden mode.
+	box.xml	         -added option to enable automatic switch on and off of inset boxes.
+	document.xml	 -minor change to allow literal strings in documents.
+	feedimport.xml	 -minor change made on wording of some text.
+	filterbox.xml    -added some additional labels that can be translated.
+	gallery.xml	 -added option to allow embedded audio, video and files gallery display modes.
+	list.xml	 -minor change to a field size
+	preferences.xml  -added new option for bookmarks
+	publish.xml      -minor change to help text.
+        </pre>
+	Most of the changes to these files were minor in this release.
+        <h3>3.6 Updating Objects </h3>
+        <i>This section is related to the changes of the XML files in the previous section.</i>
+        <br>
+	Oscailt 3.0 was shipped with the site configuration for Indymedia Ireland which most installations are
+	probably using or else a derived version of it. This means that they will have most if not all, of the
+	Oscailt objects (modules) defined for that site.
+	<p>
+	Some of these modules have been expanded with extra features. To avail of these then all object instances
+	of those modules will need to be edited, the options selected and then they will need to be saved and
+	to be 're-published' so that the code cached is updated and they are active on the live site, -i.e your site.
+	<p>
+	The list of these changes are:
+	<ul>
+		<li> <strong>Box Layout</strong> -<i>-in Box View Module Module in Site Modules panel</i>
+                <br>
+		-There are new options for:
+		<ul>
+			<li> Date Activated -checkbox <i>-to switch on date enabled time display </i>
+			<li> Start Date -date <i>-Start date to display the inset </i>
+			<li> End   Date -date <i>-End date to switch off the display </i>
+		</ul>
+		The inset has to be assigned to either a page or article object for this to work as insets have
+                no independent existance on their own.
+		</p><p>
+		<li> <strong>Gallery Module </strong> -<i>-in the Layout Elements panel</i>
+		-There are new options for:
+		<ul>
+			<li> Display Type -options<i>-in Gallery Full Page View Settings </i> This selects whether the 
+                        gallery will display for images, audio, videos, or files.
+		</ul>
+		</p><p>
+
+		<li> <strong>Preferences Module </strong> -<i>-in the Layout Elements panel</i>
+		-There are new options for:
+		<ul>
+			<li> Add Bookmark -checkbox<i>-in User Menu Page Settings </i> This controls whether the
+                        'Add' Bookmark' option is display or not.
+		</ul>
+		</p>
+	</ul>
+
+	<h3>3.7 Permission Updates </h3>
+	There is one extra administrative permission added for this release. The permissions need to be updated for all defined administration roles in the database. The steps to do this are:
+	<ol>
+		<li> Login to Oscailt with full administration permissions.
+		<li> Go to the Edit Roles screen from the administration screen.
+		<li> Edit each role and if it is: 
+		<ul>
+			<li> An administration role, set the permission for <strong>Edit Spam Configuration</strong>
+		</ul>
+		<li> Save the role.
+	</ol>
+	By selecting each role for edit and saving it without any other changes, the roles in the database will 
+	be updated automatically with the new permissions. You will need to logout and then login again for the
+	permissions to take effect.
+
+        <h3>3.8 New Configuration Parameters </h3>
+	Oscailt 3.4 has added new features which will need to be configured. The first three can be set in the
+	Administration configuration screen or their defaults can be permanently set in the file
+	<strong>html/objects/systemconfig.inc</strong>
+	<ul>
+		<li> <strong>Use HTML Cache</strong> -This release introduces a basic HTML cache to help increase
+		site performance. It is only available for basic pages, like front page, newswire, comments and a
+                few others. For full listing see the function isPageHtmlCached in utilities.inc. These would typically
+		Be some of the most frequently accessed pages and caching them saves on database activity and other
+		processing to generate the page.
+		<li> <strong>Disable Open Publishing</strong> -This is used to as a mechanism to override settings at
+		the (publish) object level and to allow you to shutdown the open publishing so that only editors can 
+		publish. This is already controlled through the publish object settings, but the purpose here is to
+		allow rapid shutdown and is expected to be used in the event of spam attack.
+		<li> <strong>Check Spamwords </strong> -This is used to switch on spam word detection and hence
+		story rejection during publishing. There is an associated screen to enter a list of spam words to 
+		be scanned in each new story and if a match of 2 compulsory words and 3 optional words are found then
+                it is treated as spam. Compulsory words are entered into the list with a leading '+' symbol.
+	</ul>
+	This next set of configuration parameters can only be set in the file 
+        <strong>html/cache/systemconfig.php</strong>
+	<ul>
+		<li> <strong>Embedded Video Default Mode</strong> -This is used to control whether to automatically
+		hide or display the cover images of embedded video as display of the cover images results in retrieval
+		for the video host site, thereby allowing them to track IPs. With this off, you need to click on the
+		icon first to display the cover image.
+		<li> <strong>Safe Video List</strong> -If the auto hide option is selected above, you can override this
+                setting for a list of embedded video host sites that you can opt out of the full list. So for example
+		you might want to always show the cover images of Politube embedded videos. The video ids used must
+                match exactly those used in the objects/videos.inc file.
+		<li> <strong>Video Cover Image Retrieval</strong> -This list of video types is used for indicating for 
+                which video types, to automatically retrieve the cover images in advance. Some embedded video host
+                sites have static images and these can be retrieved in advance by Oscailt. Currently this is only
+                implemented for YouTube. The idea is to provide the cover images without the doing so on every access.
+	</ul>
+
+	<p>
+	<h3>3.9 Shared Memory </h3>
+	The use of shared memory basically allows you to have global variables in PHP. This means you can do things
+	like access counts for particular pages. However it brings it's own problems which are namely handling
+	the problem where two process (i.e. requests) are trying to write to the same memory at the same time.
+	<p>
+	To use shared memory, the proper PHP extensions must be already installed. Oscailt makes use of <b>Semaphores</b>
+	to control simultaneous access by separate webserver requests. This means that the PHP semaphore extension
+	must also be installed. For most Unix/Linux servers, the PHP installation will nearly always have these 
+        installed by default.
+	<p>
+	Once these conditions are met, the shared memory then needs to be activated through one of the administration
+	screen in Oscailt.
+	<p>
+	Note: <i>Semaphores are not available in Windows. If you are installing in Windows remove the comments to the functions sem_get, sem_release, sem_acquire and sem_remove in objects/memorymgmt.inc. Do <b>not</b> do this if you are installing on any other type of server/computer.</i>
+	<p>
+	The steps to configure and activate installed memory in Oscailt are:
+	<ol>
+		<li> First do all other installation steps (full or upgrade as appropriate) for Oscailt.
+		<p>
+		<li> Login to the Oscailt and go to the administration 'Edit Configuration' screen and then click on 'System Installation Info' tab.
+		<br> Under the PHP extensions section, confirm that the <b>shmem</b> and <b>sysvsem</b> extensions are listed as installed. 
+		<p>
+		<li> If the above extensions are installed, then click on the main tab of 'Edit Configuration' and scroll down to the 'Miscellaneous' section and tick the option for Shared Memory Features
+		<br><i>The next step is to activate the shared memory. At this point if you have login access to the 
+		host (i.e Linux/Unix machine), you may be able to run the command '<b>ipcs</b>' to display the keys
+		and ids of any shared memory or semaphores already be used by other programs. These can be useful to
+                check against the hardcoded values that will be used by Oscailt in the objects/memorymgmt.inc file.</i>
+		<p>
+		<li> Now click on 'Shared Memory Activation' tab of the 'Edit Configuration' screen. 
+		<br> There is an option at this point to double check that the shared memory is not in use by
+		some other application on the server. If this test indicates there is a conflict then it is
+		not advisible to activate the shared memory until a different set of ids are used in the Oscailt 
+		file objects/memorymgmt.inc -this can be changed manually.
+		<p> If the above test is okay, you can then tick the shared memory activation checkbox and then
+		scroll to the bottom of the page and click on 'Save Configuration'. 
+		<p>
+		<li> To deactivate the shared memory just untick the checkbox and save again.
+	</ol>
+	<h4>3.9.1 Shared Memory Changes in this release </h4>
+        A few extra variables were added to the list of shared memory variables in Oscailt for this release. These
+        are contained in the PHP files and as stated already before the files are copied, note 1 below should be
+        followed.
+        <p>
+	<b>Note 1:</b> <font color="red">If you update any Oscailt software, you should deactivate the shared memory,
+        then install the software, and then re-activate the shared memory</font>
+        <br>
+	<b>Note 2:</b> <font color="purple"><b>If you server gets rebooted for any reason when shared memory had 
+        already been activated in Oscailt, then you may need to deactivate and activate the memory again.</b></font>
+	<p>
+        <h3>3.10 Update of Graphics Files </h3>
+	As part of the update there are a number of images files which are new and need to be copied over to 
+	the <strong>graphics/</strong> directory and these are:
+	<pre class="file_text">
+	addtofavs.gif   -<i>This is the Add To Favourites bookmark icon</i>
+	facebook.png    -<i>This is used for social bookmarks</i>
+        playfilm.png    -<i>Playfilm icon used for embedded videos</i>
+        annotate.gif    -<i>Annotate icon for stories and comments</i>
+	</pre>
+	There is one further additional image file that needs to be copied over to the 
+        <strong>graphics/mediaicons/48x48/</strong> directory and it is:
+	<pre class="file_text">
+	spam.png           -<i>new admin icon for Edit Spam admin screen</i>
+	</pre>
+
+	
+	<h3>3.10 Updating the Style Sheet Files </h3>
+	The style sheets are used to control the color and fonts to enable it to be customised to a particular site.
+	There are <u>three</u> style sheet files in use and they are generally found in the directory:
+	<pre class="file_text">
+	html/attachments/sites/default/ </pre>
+	and are called:
+	<pre class="file_text">
+        common.css
+	contentstyle.css
+	style.css </pre>
+	These files can be either changed by logging into the server or through the Oscailt administration screen. 
+
+	For this release, the file <strong>common.css</strong> should be edited with the following additions. This is
+        used in the hourly stats display of comments in the administration statistics screen.
+
+	<pre class="file_text">
+        TR.stats_bar {
+            background-color: #d0ecc0;
+        }
+
+        </pre>
+	There are no changes for <strong>contentstyle.css</strong> or for <strong>style.css</strong>.  
+        The Indymedia Ireland versions of these are not shipped as part of 
+	this release as they are now different, since additions have been part of the customisation
+        of that site nor do they have any extra mandatory style tags.
+
+	<hr>
+	<i>Aug 2010</i><br>
+	<br>
+</body>
+</html>

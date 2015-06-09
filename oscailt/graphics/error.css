@@ -1,0 +1,55 @@
+P  {}
+
+H1  {}
+
+H2  {}
+
+H3  {}
+
+A  {color : #006331;
+	text-decoration : none;
+}
+
+A:Visited  {}
+
+A:Active  {}
+
+A:Hover  {color : #006331;
+	text-decoration : underline;
+}
+
+BODY  {
+	font-family : Verdana;
+	color : #000000;
+	background-color : White;
+	margin-left : 0;
+	margin-right : 0;
+	margin-top : 0;
+	margin-bottom : 0;
+	margin : 0;
+	font-size : x-small;
+}
+
+.docHeader  {
+	color : #000000;
+	font-weight : bold;
+	font-family : Arial;
+	font-size : small;
+	text-align : center;
+}
+
+.docFooter  {
+	color : #000000;
+	font-family : Arial;
+	text-align : right;
+	font-size : xx-small;
+}
+
+.docMenu  {
+	background-color : #FF00FF;
+	visibility : visible;
+	width : auto;
+	position : absolute;
+	top : 33;
+}
+

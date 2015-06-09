@@ -1,0 +1,255 @@
+<html>
+<title> Oscailt v3.x Features </title>
+<style type="text/css" media="all">
+	FONT.php_file { color:purple;
+	}
+	FONT.php_dir  { color:purple;
+	}
+	FONT.php_code { color:purple;
+	}
+	FONT.oscailt_objs { color:blue;
+	}
+	TD.php_file { color:purple;
+	}
+	TD.php_file { VERTICAL-ALIGN: top; color:purple }
+</style>
+<body>
+
+
+<h1> Oscailt v3.x Features </h1>
+<h2> 1. Introduction </h2>
+Oscailt 3.x introduced a range of new features to those already provided in Oscailt 2.x. The latest of release is 
+now at Oscailt 3.5. See the releasenotes.txt for a list of all changes since 3.0. 
+<p>
+The Oscailt home page <a href="http://wwww.indymedia.ie/oscailt/">www.indymedia.ie/oscailt/</a> lists some of the 
+sites using the software. It has been running the Indymedia Ireland website since cira 2003.
+<p>
+<h2> 2. Feature List </h2>
+The feature list is divided into three main groupings covering what the public sees, the configuration of the site setup and administrative side functionality.
+
+<h3> 2.1 Public Feature List </h3>
+<ul>
+<li> Publishing of stories by categories (e.g. news, press release, event), topic and region. Each story can 
+	include (with captions)
+<ul>
+	<li> Images, audio, video and various attached file (configurable) types (e.g. PDF)
+	<li> Multiple embedded video (e.g. Politube, Vimeo, YouTube)
+	<li> Multiple embedded audio (.mp3 only) and embedded audio player 
+</ul>
+<li> Publishing of comments to stories and these can include:
+<ul>
+	<li> Images, audio, video and various attached file types (e.g. PDF)
+	<li> Multiple embedded video (e.g. Politube, Vimeo, YouTube)
+	<li> Multiple embedded audio (.mp3 only) and embedded audio player
+</ul>
+<li> Common Publish options for stories and comments 
+<ul>
+	<li> Use of a WYSIWYG HTML editor (<i>Configurable. TinyMCE or OpenWYSIWYG editors</i>)
+	<li> Users can opt not to display email address.
+</ul>
+<li> Newswires and Headlines (for various categories) with automatic image thumbnail generation.
+<li> Latest Comments page
+<li> Export RSS and Atom Feeds and Javascript (non-standard) Feeds
+<li> Event Calendar with Weekly, Bi-Weekly and Monthly display modes.
+<li> Archives page
+<li> Photo, Audio, (Embedded) Video and Miscellaneous files Gallery page
+<li> Search and Advanced Search pages with word highlighting by colour.
+<li> Contact form
+<li> Reported Posts / Abuse form
+<li> IMC Site listing
+<li> User Preferences <i>(Controlled by Cookies)</i>
+<ul>
+	<li> Ability of user to set default language
+	<li> Control display of latest comments page (<i>Editors only</i>)
+	<li> Automatically NOT display embedded video cover image to avoid IP tracking by video hosting server. This
+	also includes ability to retrieve, cache and display static cover images for Politube, YouTube and Vimeo videos.
+	<li> Control font size
+	<li> Control default calendar display mode (weekly, bi-weekly or monthly)
+	<li> Control comment display mode in article/story pages.
+	<li> Control display of bookmark icon.
+</ul>
+<li> Help Pages (<i>various and configurable by editors</i>)
+
+</ul>
+
+<h3> 2.2 General Site Feature List </h3>
+Oscailt provides much of the core functionality through various *modules* and these are generally configurable in 
+both their placement on the site and in the content. In most cases, the main text labels visible on the site can
+be configured for different languages.
+<ul>
+<li> Ability to featurize stories.
+<li> Ability to schedule automatic unhiding of featured stories.
+<li> Ability to featurize images and audio for inclusion in gallery.
+<li> Ability to link translated stories together (by editor only)
+<li> Ability to allow stories to be automatically editable by public either via session cookie of publisher or by password
+<li> Dynamically configurable multiple types of RSS and ATOM feeds. Uses Magpie PHP library version 0.7
+<li> Support for multiple languages. 
+<ul>
+	<li> Via xml files for layout and configuration language support allowing translation of page titles, labels, links and other descriptive text.
+	<li> Translations allowed for topics, regions and (story) types.
+	<li> Supports character set ISO-8859-1 
+</ul>
+<br>
+<li> Article (i.e. story) display module. Includes print page mode.
+<ul>
+	<li> Includes photo essay mode using Javascript to generate a simplified slide show.
+</ul>
+<li> Newswire display module. Includes headlines mode.
+<li> Latest comments display module. 
+<li> Photo, audio, (embedded) video and miscellaneous files gallery display module. 
+<li> Archives calendar type module.
+<li> Publish form module. Optional numeric text based captcha.
+<li> Contact form configuration. Includes basic anti spam measures.
+<li> Search form configuration. 
+<br>
+<li> Configuration of the site layout through dynamically configurable pages and objects for:
+<ul>
+	<li> Article display.
+        <ul>
+	    <li> Option to display social bookmarks.
+        </ul>
+	<li> Newswire display 
+	<li> Headers, Footers, Menu bars and Links.
+	<li> Razorwire for announcements and promotions.
+	<li> Headlines box and Related stories box.
+	<li> Events and Archives calendar display.
+	<li> Publish and contact form display.
+	<li> RSS and Atom imported feeds / syndication.
+	<li> IMC Site Listing module including ability to filter out list of dead IMC sites.
+	<li> Configurable Static documents (e.g. About page, guidelines, info) including ability to make public or private.
+	<li> Defining listings of links.
+	<li> Use of templates. Any object can be saved as a template and re-used as a template to provide a basic building block.
+</ul>
+<li> Configurable bargraph useful for fundraising drives.
+<li> Code Box module. Allows inclusion of PHP code or scripts. Used for implementing razorwire announcements
+<li> Facility to list recently hidden stories and or comments on public site along with hide reason from editorial log.
+<li> Admin tool to see all translation links. <i>Primarily added for debugging</i>
+<li> Creation of simple rules to fix incoming RSS or Atom feeds.
+</ul>
+
+<h3> 2.3 Administrative Feature List </h3>
+<ul>
+<li> Friendly URLs to enable nicer URLs to be defined and used.
+<li> Site style sheet viewing and editing.
+<li> Database caching for reducing database load.
+<li> Basic html caching for increased response and load reduction.
+<li> Image and RSS/Atom feed caches
+<li> Object layout and configuration screen.
+<li> Object summary viewer listing objects that have been translated.
+<li> General configuration of site settings including
+<ul>
+	<li> Site name and URL and HTML meta tag description field.
+	<li> Allowing and specifying maximum upload sizes for stories and comments separately for:
+	<ul>
+		<li> Images, audio, video and or miscellaneous files (e.g. pdf)
+	</ul>
+	<li> Specifying max number of attachments (of above) types for stories and comments separately.
+	<li> Specifying max content size for story summary and contents and comment content.
+	<li> Enable use of HTML tags in story summaries, content and or comments.
+	<li> Data storage directory locations
+	<li> Cache file storage locations
+	<li> Email contact and notification addresses for contact form and editorial actions.
+	<li> IP monitor cache size
+	<li> Comment publish delay (mins)
+	<li> The maximum time an editor can keep a story locked for editing.
+	<li> Email notification address for editor auditing of stories and comments.
+	<li> Enable newswire thumbnails
+	<li> Logging level (for debug)
+	<li> Site timezone offset.
+</ul>
+<li> View screen for basic system installation information for Oscailt, MySQL, Webserver and PHP.
+<p>
+<li> Topics configuration screen. (topics are for story categories. e.g. war, peace, environment...)
+<li> Regions configuration screen. (regions are for story categories. e.g. national, international...)
+<li> Types configuration screen. (types article types. e.g. feature, news, press release, event....)
+<li> Languages configuration screen. -i.e. the list of site supported languages.
+<p>
+<li> Anti Spam measures.
+<ul>
+	<li> Publishing tokens to prevent rapid multiple posts.
+	<li> Configurable use of text based numerical captcha.
+	<li> IP Monitoring
+	<li> IP Banning for publish
+	<li> Domain banning for publish
+	<li> IP Banning and automatic redirection.
+	<li> IP Blocking of entire site for identified spam bots.
+	<li> Spam wordlist configuration for spam detection on stories and or comments.
+	<li> Name Banning 
+	<li> Story Locking
+	<li> Comment Delay. Configurable delay of 0 - 60 minutes before published comments appear
+	<li> Publish Story shutdown. 
+</ul>
+<BR>
+<li> Fine control of site access and permission for editors through editorial roles for:
+<ul>
+	<li> Editorial actions like hide, delete, edit, featurize, unhide
+	<li> Administrative tasks
+	<li> Site layout and page configuration
+</ul>
+<li> Editorial actions for: <i>(auditing logging exists for most of these actions)</i>
+<ul>
+	<li> Story and or comment hides, delete, edits, featurize, unhides, downgrades, clip, enabling public editing
+	<li> Single action multiple hide (or unhide) of newswire stories and or of story comments.
+	<li> Swapping displayed image order in stories and comments.
+	<li> Moving attachment between either a story and comment.
+	<li> Editor user account creates, updates and deletes.
+	<li> Switch on of IP monitor and automatic switch off.
+	<li> IP and Name bans and ban extensions.
+	<li> Creates, updates and deletes of topics, regions, types and languages.
+	<li> Layout edits and updates.
+</ul>
+<BR>
+<li> Importing and exports of site definitions and objects via XML files. (Installation allows import).
+<BR>
+<li> Reported posts facility that can report the URL of any story or comment with scrreen to view submitted reports.
+<li> Multiple editorial user accounts.
+<ul>
+	<li> Roles and permmissions can be set per user account.
+	<li> Can optionally add basic info visible to other editorial users.
+	<li> Set options for admin dashboard mode.
+	<li> Set options for automatic notification on story and or comment publishes
+	<li> Editorial screen can handle multiple pages (size 25) in editor setup display.
+</ul>
+<BR>
+<li> User logon tracking and basic inter-Oscailt user message board and shared scratch pad system.
+<li> Scheduled system message reminders (to message board system).
+<p>
+<li> Administrative image managing facility to:
+<ul>
+	<li> List all attachment files for a given month.
+	<li> Show image thumbnails, cached image(s) and full image.
+	<li> Retrieve image information on file sizes, width &amp; height, type, date, parent story or comment link etc
+	<li> Display 'Exif' camera data (<i>on Unix installations only</i>)
+	<li> Automatically identify incorrect image file types.
+	<li> Convert .bmp files to .jpg files or rename to correct file type.
+	<li> Rotate an image clockwise or counter-clockwise.
+</ul>
+<p>
+<li> Administrative site logs viewing facility for site, editorial actions, security, spam and RSS error logs. This
+includes extensive filtering options.
+<li> Administrative screen to view last connection status for imported RSS and Atom feeds.
+<li> Clear cache option for SQL (database), RSS, OML, HTML, image and object caches.
+<li> Basic site statistics on numbers of stories and comments published by category and per day, month, year.
+<ul>
+	<li> Use of shared memory to gather page hits by page type (e.g. events, publish, newswire, article)
+	<li> Use of shared memory to calculate most popular story.
+	<li> Use of shared memory to monitor recent server memory usage.
+</ul>
+<p>
+<li> Bulk deletes of hidden stories and or comments and attachments.
+<li> Basic administration screen dasboard of summary info.
+</ul>
+<p>
+<h2> 3. Software Requirements </h2>
+To install and run Oscailt, you need the following:
+<ul>
+	<li> Apache Web Server -Other server types may work, but ideally Apache should be used.
+	<li> MySQL Database 
+	<li> PHP 4.x -however it is recommended to use PHP 5.x. Early versions of PHP 4 may present problems, but PHP 4.3 or later seems to work fine.
+	<li> Email server -If you will be making use of email and email notifications, ideally this should be setup on the host. It normally is.
+</ul>
+<br>
+<hr>
+<i>Last update: Nov 2011</i>
+</body>
+</html>

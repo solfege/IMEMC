@@ -1,0 +1,242 @@
+<html>
+<title> Oscailt 3.x Design Document: Table of Contents </title>
+<style type="text/css" media="all">
+	FONT.php_file { color:purple;
+	}
+	FONT.php_dir  { color:purple;
+	}
+	FONT.php_code { color:purple;
+	}
+	FONT.oscailt_objs { color:blue;
+	}
+	TD.php_file { color:purple;
+	}
+	FONT.dirpath { color:gray; TEXT-DECORATION: underline; FONT-WEIGHT: bold;
+	}
+	TD.php_file { VERTICAL-ALIGN: top; color:purple }
+</style>
+<body>
+
+<h1> Oscailt 3.x Design Document </h1>
+<h2> Table of Contents </h2>
+<ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch1_introduction">1. Introduction </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch1_1_">1.1 How To Read This Document </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch1_2_">1.2 Understanding Oscailt For Programmers </a>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch2_introduction">2. Design Overview </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch2_1_">2.1 The Main Layers of Oscailt </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch2_2_">2.2 The Main Functional Blocks </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch2_3_">2.3 Oscailt 3.x Architecture </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch2_3_1_">2.3.1 Meta Data Management System</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch2_3_2_">2.3.2 Optimised Runtime Display System</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch2_3_3_">2.3.3 XML Meta Data Object Set </a>
+	</ul>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch3_introduction">3. Display Overview </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch3_1_">3.1 Introduction </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch3_2_">3.2 Basic Layout </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch3_3_">3.3 Page Rendering</a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch3_3_1_">3.3.1 Output Buffering and Oscailt</a>
+	</ul>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch4_introduction">4. Design Details </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_1_">4.1 Layout, Module and Element Configuration </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_1_1_">4.1.1 How and Where Elements, Modules and Layouts are Implemented</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_1_2_">4.1.2 Storage of the Elements, Modules and Layouts Objects</a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_2_">4.2 Handling of URL Requests </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_2_1_">4.2.1 Use of Oscailt Friendly URLs </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_2_2_">4.2.2 Implementation of Oscailt Friendly URLs </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_2_3_">4.2.3 Limitations of Oscailt Friendly URLs </a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_3_">4.3 The Code Cache </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_3_1_">4.3.1 Building the Code Cache </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_3_2_">4.3.2 File Organistation in the Code Cache </a>
+		<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_3_2_1_">4.3.2.1 Organistation by Language</a>
+	</ul>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_4_">4.4 More on Handling Requests and the Code Cache </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_4_1_">4.4.1 Execution of index.php and Loading of Code Cache Objects </a>
+		<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_4_1_1_">4.4.1.1 First Cached File: Displayable Runtime Module</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_4_1_2_">4.4.1.2 Second Cached File: Page Layout Module</a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_4_2_">4.4.2 Execution Sequence for a Request in Live (Non Cached) Mode</a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_5_">4.5 File Organisation </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_">4.6 Classes and Class Hierarchy </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_1_">4.6.1 Runtime Display type Classes </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_2_">4.6.2 More about Runtime Classes and Core Oscailt Classes</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_3_">4.6.3 Class Tree for the Abstract Indy Classes</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_4_">4.6.4 The IndyBasicObject Class and It's Derivatives </a>
+		<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_4_1_">4.6.4.1 The IndyListObject Class and It's Derivatives </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_4_2_">4.6.4.2 The IndySiteModuleObject Class and It's Derivatives </a>
+		</ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_5_">4.6.5 The IndyObjectManager Class </a>
+		<ul>
+			<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_5_1_">4.6.5.1 Usage of indyObjectManager by index.php</a>
+			<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_5_2_">4.6.5.2 Usage of indyObjectManager by admin.php</a>
+		</ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_6_">4.6.6 The IndyObjectActionRequest Class</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_7_">4.6.7 The Classes in the indydataclasses Directory</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_8_">4.6.8 The ItemAction Class and Editor Options</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_6_9_">4.6.9 Core Functionality Classes from Oscailt 2x</a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_7_">4.7 Configuration within Oscailt</a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_7_1_">4.7.1 Config Options and Files</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_7_2_">4.7.2 Changes to attachments.php</a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch4_7_3_">4.7.3 Changes to permissions.php</a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_8_">4.8 The Oscailt Database</a>
+	<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_8_1_">4.8.1 Database Connect and Commits</a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_8_2_">4.8.2 List of Oscailt Database Tables</a>
+	</ul>
+        <li> <a href="Oscailt_3x_design.html#oscailt_ch4_9_">4.9 Edit Locks </a>
+        <li> <a href="Oscailt_3x_design.html#oscailt_ch4_10_">4.10 Controlling Use of HTML and Other Tags in Input</a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch4_11_">4.11 Use of JavaScript in Oscailt </a>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch5_introduction">5. The Admin Functionality Explained </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch5_1_">5.1 Admin.php Code Execution Sequence </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch5_1_1_">5.1.1 Main Classes Used </a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch5_2_">5.2 Admin XML Files </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch5_2_1_">5.2.1 More about the XML Files</a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch5_3_">5.3 Basic Admin Files </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch5_3_1_">5.3.1 Miscellaneous Files</a>
+	        <ul>
+		    <li> <a href="Oscailt_3x_design.html#oscailt_ch5_3_1_1_">5.3.1.1 The Adminfooter.inc File</a>
+	        </ul>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch5_4_">5.4 Edit Topics, Regions, Types and Languages</a>
+        <li> <a href="Oscailt_3x_design.html#oscailt_ch5_5_">5.5 The IP Monitor </a>
+        <li> <a href="Oscailt_3x_design.html#oscailt_ch5_6_">5.6 IP Banning </a>
+        <li> <a href="Oscailt_3x_design.html#oscailt_ch5_7_">5.7 Editor Status and Messaging </a>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch6_introduction">6. Language Translation </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch6_1_">6.1 Definiting Languages in Oscailt</a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch6_2_">6.2 Master Pages, Language Specific Pages: How to Translate Oscailt Public Pages</a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch6_2_1_">6.2.1 Default Language</a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch6_3_">6.3 How to Translate Oscailt Administration Pages</a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch6_3_1_">6.3.1 Language Versions of Administration Layout Pages</a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch6_4_">6.4 General Language Support Background</a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch6_5_">6.5 Unicode Support</a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch6_6_">6.6 Text Not Easily Translated </a>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch7_introduction">7. Log Files </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch7_1_">7.1 sitelog.txt </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch7_2_">7.2 actionlog.txt </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch7_3_">7.3 securitylog.txt </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch7_4_">7.4 spamlog.txt </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch7_5_">7.5 reported_post.txt </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch7_6_">7.6 spamlog_contact.txt </a>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch8_introduction">8. Caching and the QueryCache Class </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch8_1_">8.1 The QueryCache Class </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch8_1_1_">8.1.1 Database Cache </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch8_1_2_">8.1.2 Database Connection(s) </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch8_1_3_">8.1.3 Limitations of the Database Cache </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch8_1_4_">8.1.4 Limitations: Update </a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch8_2_">8.2 The Image Cache </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch8_3_">8.3 Other Caches Used by Oscailt </a>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch9_introduction">9. Editor Permissions and Roles </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch9_1_">9.1 Important Files for Permissions and Roles </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch9_2_">9.2 Data for Permissions and Roles </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch9_3_">9.3 Role Permissions </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch9_3_1_">9.3.1 Code Changes and Permission Updates </a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch9_4_">9.4 Permissions in Action</a>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch10_introduction">10. Module Specifics</a>
+<ul>
+        <li> <a href="Oscailt_3x_design.html#oscailt_ch10_1_">10.1 Contact Form including Reported Posts </a>
+        <ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch10_1_1_">10.1.1 Reported Posts</a>
+        </ul>
+        <li> <a href="Oscailt_3x_design.html#oscailt_ch10_2_">10.2 The Publish Form </a>
+           <ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch10_2_1_">10.2.1 Overview </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch10_2_2_">10.2.2 Components </a>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch10_2_3_">10.2.3 Publish Processing </a>
+           </ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch10_3_">10.3 Events and Events Display</a>
+           <ul>
+	   <li> <a href="Oscailt_3x_design.html#oscailt_ch10_3_1_">10.3.1 Overview </a>
+	   <li> <a href="Oscailt_3x_design.html#oscailt_ch10_3_2_">10.3.2 Displaying Events </a>
+	   <ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch10_3_2_1_">10.3.2.1 Core Files for Event Functionality </a>
+	   </ul>
+           <li> <a href="Oscailt_3x_design.html#oscailt_ch10_3_3_">10.3.3 Events and the Publish Form</a>
+        </ul>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch11_introduction">11. Changing Code and Adding New Functionality </a>
+	<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch11_1_">11.1 Overview </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch11_2_">11.2 Process to Follow </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch11_3_">11.3 Points to Consider </a>
+        </ul>
+
+<li> <a href="Oscailt_3x_design.html#oscailt_ch12_introduction">12. Exports and Dump Files </a>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch13_introduction">13. Use of Style Sheets in Oscailt </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch13_1_">13.1 Overview </a>
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch14_introduction">14. Appendix A - Some Background on Objects, Classes, Functions and Methods </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch14_1_">14.1 Introduction </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch14_2_">14.2 Classes and Objects </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch14_3_">14.3 Functions and Methods </a>
+	<ul>
+		<li> <a href="Oscailt_3x_design.html#oscailt_ch14_3_1_">14.3.1 Syntax and Conventions </a>
+	</ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch14_4_">14.4 Object Data </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch14_5_">14.5 Class Inheritance </a>
+	<li> 
+</ul>
+<li> <a href="Oscailt_3x_design.html#oscailt_ch15_introduction">15. Appendix B - Some Resources </a>
+<ul>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch15_1_">15.1 PHP Manual </a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch15_2_">15.2 Editor Tool</a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch15_3_">15.3 File Difference and Merge Tools for Windows</a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch15_4_">15.4 Development Environment Tool</a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch15_5_">15.5 CVS Source Control</a>
+	<li> <a href="Oscailt_3x_design.html#oscailt_ch15_6_">15.6 Unicode and UTF-8</a>
+</ul>
+</ul>
+<hr>
+<p>
+<i>Last updated: June 2008</i>
+</body>
+</html>

@@ -1,0 +1,3023 @@
+<html>
+<title> Oscailt 3.x Design Document </title>
+<style type="text/css" media="all">
+	H5 { color:green; font-size: 14px; margin-bottom: 5px;}
+
+	FONT.php_file { color:purple;
+	}
+	FONT.php_dir  { color:purple;
+	}
+	FONT.php_code { color:purple;
+	}
+	FONT.oscailt_objs { color:blue;
+	}
+	TD.php_file { color:purple;
+	}
+	TD.oscailt_objs{ color:blue;
+	}
+	FONT.dirpath { color:gray; TEXT-DECORATION: underline; FONT-WEIGHT: bold;
+	}
+	TD.php_file { VERTICAL-ALIGN: top; color:purple }
+</style>
+<body>
+
+
+<h1> Oscailt 3.x Design Document </h1>
+<a name="oscailt_ch1_introduction">
+<h2>1. Introduction </h2>
+Their are many new features introduced into Oscailt 3.x, see <a href="oscailt_3x_features.html">Oscailt 3.x features</a> for a list of these, but overall the main characteristic over Oscailt 2.x is that a new layer has been added that is designed to
+give much greater configurability to the system, although the price for this is of course greater complexity.
+One could describe this as a meta layer.
+<p>
+One of the other key differences is that some of the code is now cached. The idea is that instead of doing all the 
+file includes and the meta layer processing each time when the PHP is executed, these are all saved to the cache
+which then saves on execution speed while allowing for greater modularity of the source files without impacting 
+performance. In effect the dynamic configuration that allows flexible control over the site layout which is
+achieved through the new meta layer, is effectively compiled in the cache.
+<p>
+Another key change is that nearly all of the text in the code has now been moved out to configurable XML files.
+This change in theory, makes it easier to customise Oscailt for different languages as it just requires the
+text in the XML files to be changed rather than going through all the code. There are other configurable aspects
+of Oscailt which are controlled by these XML files too such as certain options or components active in various
+instances of configurable and displayable modules.
+<a name="oscailt_ch1_1_">
+<h3>1.1 How To Read This Document </h3>
+Ideally you should have a working version of Oscailt 3.x installed in a place where you are reading this document.
+At a minimum, you should have a copy of the code at least unzipped. Then as you read through this document, it
+is strongly advised to use an text editor to view any of the files mentioned and to browse the directories to verify
+where particular files are. If you have a working system, it is advisable to view each of the webpages as they
+are discussed.
+<p>Along with this document, there are a companion set of automatically generated html files produced by
+<a href="http://www.phpdoc.org">phpDocumentator 1.3.0</a> 
+which is a freeware PHP tool that can analyse PHP code and extract out all the classes and functions and
+the class relationships or hierarchy.
+<br><i>Note: These have yet to be checked into cvs</i>.
+
+<a name="oscailt_ch1_2_">
+<h3>1.2 Understanding Oscailt For Programmers </h3>
+The best way to understand Oscailt if you intend to modify the code, is to install it, setup it up, publish a
+few test stories and login in as administrator to get an overview of the main areas and then to look at the
+HTML source of the various pages. It is also worth looking at how the display changes between when you are logged
+in and not, for the extra options displayed like <i>clip, edit, hide, unhide, featurise</i> and <i>lock</i>.
+One should also review the administration only section of the site where the configuration is carried out
+and the area where the elements, modules and layout objects are defined.
+In that way, you will then be already familiar with what the code and the generated HTML or fragments of HTML
+are trying to achieve, because otherwise none of the detail will make any sense.
+
+<a name="oscailt_ch2_introduction">
+<h2>2. Design Overview </h2>
+<a name="oscailt_ch2_1_">
+<h3>2.1 The Main Layers of Oscailt </h3>
+The Oscailt code is now divided into 2 main layers. There is the old <strong>inner </strong> core and the 
+new <strong> outer </strong> core which implements the configurable aspect of it. It would probably be worthwhile
+reading through the design notes for Oscailt 2.x as that would be a good help in understanding how the code
+has evolved.
+<p>
+As with trying to understand any code base, there are many ways to view it, in terms of the functionality that
+you are interested in and what perspectives you take. For example you could look at it from the perspective of
+how an incoming request is handled, or in terms of the internal data representation in terms of objects. 
+Another possibility is to look at it from the html or site configuration points of view. When one is able
+to understand the code from multiple angles then you are in a strong position to make the most far reaching
+changes.
+
+The diagrams below attempt to give some insight to these layers.
+<p align="center">
+<img src="oscailt_layers.jpg" align="middle" alt="Fig 1: Oscailt Layers" >
+<p>
+<a name="oscailt_ch2_2_">
+<h3>2.2 The Main Functional Blocks </h3>
+There are three broad functional blocks to Oscailt and these are:
+<ol>
+<li> <u>Public Site. </u>
+<p> <li> <u>Management of the Public Site.</u>
+<p> <li> <u>Administration Section</u>  -<i>which can be further divided into two sections</i>:
+<p>
+<i> <ul>
+<li> General configuration of site settings and editor accounts.
+<li> Configuration of the site layout.
+</ul> </i>
+</ol>
+Note: The public never see the Administration section of the site.
+
+<a name="oscailt_ch2_3_">
+<h3>2.3 Oscailt 3.x Architecture </h3>
+This next diagram taken from the Oscailt online documentation at: 
+<a href="https://docs.indymedia.org/view/Devel/OscailtDesignGeneral">https://docs.indymedia.org/view/Devel/OscailtDesignGeneral</a>
+shows another way of viewing the internals from the processing and object point of view. 
+As can be seen from the diagram below, the architecture is divided up into several different sub-systems. These 
+sub-systems are the following.
+<p align="center">
+<img src="oscailt-archi.jpg" align="middle" alt="Fig 2: Oscailt Architecture" >
+</p>
+<ol>
+   <li>. Object Meta Data Management System
+   <li>. Front end URL translation and multi-lingual page composition
+   <li>. Optimised Runtime Display System
+</ol>
+<a name="oscailt_ch2_3_1_">
+<h4>2.3.1 Meta Data Management System</h4>
+The object metadata management system is the basic engine that allows oscailt to produce such flexible and dynamic 
+output. It manages the relationships between objects, the linking between translations of objects, the updating of 
+objects' metadata and the caching of objects. Since object configuration changes will always be much less frequent 
+than simple user requests, the design of oscailt aimed to put as much of the functionality as was possible into 
+this system. It is optimised for completeness rather than speed.
+<p>
+It produces cached versions of every object on the site. The 'displayable' objects - menus, pages, bars and inset 
+boxes are specially cached to include cached versions of all their contained objects within their cache file. This 
+limits the number of includes that are used at runtime as each page only has to include its menus, bars etc, the 
+objects contained in these objects are contained within the cache files themselves.
+
+<p>
+The modules in the system are designed to produce as much static html as possible. Calls to the runtime system are 
+only invoked where statically caching is impossible (due to automatic changes of contents such as in newswires). 
+Suffice to say that Oscailt makes every attempt possible to limit the amount of code that is executed at runtime. 
+
+<a name="oscailt_ch2_3_2_">
+<h4>2.3.2 Optimised Runtime Display System</h4>
+The runtime display system is largely built around the oscailt 2.x objects. This is a collection of objects that 
+represent the basic content elements in the system - such as the story object, the comment object, the story query 
+object and so on. These objects use the new object hierarchy of display objects to integrate them into the object 
+management system and to allow them to be easily expanded through the addition of new modules and new functionality.
+The core code is mostly stable, highly optimised and proven under high levels of traffic. The new display object 
+hierarchy provides a wealth of functionality that makes extending the runtime system as easy as inheriting a class 
+and overriding a couple of functions.
+
+<a name="oscailt_ch2_3_3_">
+<h4>2.3.3 XML Meta Data Object Set </h4>
+This is the set of XML files that are used for defining the module and objects especially the titles, text strings,
+options and so forth. This is one of the key methods by which multiple language versions can be defined and 
+deployed.  
+
+<a name="oscailt_ch3_introduction">
+<h2>3. Display Overview </h2>
+<a name="oscailt_ch3_1_">
+<h3>3.1 Introduction </h3>
+The site layout and design is presented from the point of view of the HTML in order to help understand what the
+PHP is trying to draw and because it relates to the original layout of the code and how the sequence of
+certain objects must be executed whether in the code cache or not, in order to work correctly. It is also worth
+visiting the site <a href="http://www.indymedia.ie">www.indymedia.ie</a> because this was the first site to use
+the software and it was written for it.
+<p>
+As with many sites, the layout and placement of banners, titles, stories, text and links is controlled through
+careful use of HTML tables. So in order to understand the layout, it is important to be familiar with HTML
+tables. It ought to be noted that when HTML was originally specified, tables were never intended to be used for
+layout purposes but instead were primarily for presenting data, but that's history.
+
+<a name="oscailt_ch3_2_">
+<h3>3.2 Basic Layout </h3>
+Every Oscailt HTML page generally has much the same layout consisting of a top banner and menu, a left hand side area
+with links, a central area with either a story or newswire and optionally a right hand section with further
+links and text and finally a footer usually containing more text and maybe an image. The only thing that changes
+from page to page is the contents of those broad sections and occasionally one of the side menus missing. This
+basic form is illustrated below.
+</p>
+<center>
+<table bgcolor="#eeeeee" border="1" cellpadding="4" width="70%">
+<tbody><tr><th colspan="3"> Fig 3: Oscailt General Page HTML Layout </th> </tr>
+<tr><td colspan="3">    </td> </tr>
+<tr><td colspan="3" align="center" bgcolor="#65cd65"> Menu Bar (can include banner) </td> </tr>
+<tr>
+<td bgcolor="#8888ff" width="20%"> <br> Side Bar<br>with links <br><br> search <br>and other options </td>
+<td align="center" bgcolor="#cccccc" width="60%"> <br> <b>Page Content</b> <br> Can be: <br>
+Newswire <br> Article <br> Event listing <br> <br> <br> <br> </td>
+<td bgcolor="yellow" width="20%"> <br> Local/Global Newswire Bar<br>(on certain pages) <br> <br> <br> <br> <br></td>
+</tr>
+<tr><td colspan="3" align="center" bgcolor="#77dd77"> Footer Bar with text and optional other banners / images </td> </tr>
+</tbody></table>
+</center>
+
+<p>
+One of the most important consequences of this is that it imposes a certain order on how the HTML is generated.
+So for example, the code needs to generate the header section first, followed by the right menu, then the centre,
+then the left menu if included and lastly the footer. In theory this order could be changed by storing the
+blocks of generated HTML and re-ordering but in reality no one is likely to code it that way and it would also
+happen to make it both much harder to understand and to debug since if certain critical HTML tags are not closed,
+it can mean the entire page is not rendered properly by the web browser.
+<p>
+In fact this is one of the main reasons why the public are not allowed publish stories with HTML tags in them
+except for a few basic ones, because it would be so easy to break the overall HTML of the page and would require
+significant human effort to continually fix it.
+<a name="oscailt_ch3_3_">
+<h3>3.3 Page Rendering </h3>
+In fact the above is not quite true, because Oscailt takes advantage of the ability of PHP to buffer the output.
+So what it does is that it buffers the output for the page content part only -see diagram above, and saves this
+to a variable called $PAGE_CONTENTS. And since every page has a page layout associated with it, then the next
+step is to generate the HTML for this page. This consists of the top menu bar, the right and left columns if 
+present and the footer. At the appropriate point -i.e. after the left column is generated, the contents of the 
+$PAGE_CONTENTS variable are output to the (buffered) stream and then the remaining part of the page is generated.
+<p>
+It is clear though that the original rule about the order of outputting the HTML from the server is still valid
+and holds in this case. 
+<p>
+The object id for the page layout is stored in the cache file for the original target page as $PAGE_LAYOUT_ID
+and this is how Oscailt, then determines which cached page to load for the associated page layout.
+<a name="oscailt_ch3_3_1_">
+<h4> 3.3.1 Output Buffering and Oscailt </h4>
+PHP allows you to buffer the HTML output and even manipulate it to some extent. Buffering is used because it
+helps increase response times by transmitting data all in one go. The mechanism that PHP introduces for this is 
+the following set of commands:
+<font class="php_code">
+<pre>
+    ob_start();   -start the buffering of output
+    .
+    .
+    .
+    ob_end_flush();
+</pre>
+</font>
+There are two additional PHP commands for buffering that are interest and these are: <strong>
+<font class="php_code">ob_end_clean() </font></strong>. This can be used for clearing the contents of
+the output buffer, but continuing in buffer mode. The second command is: <strong>
+<font class="php_code">ob_get_contents() </font></strong> and would usually be used in conjunction with the
+previous command. It can be used for storing the contents of the buffer so far into a variable.
+<p>
+A typical scenario of the way Oscailt uses this feature would be the following code snippet.
+<font class="php_code">
+<pre>
+    ob_start();
+    .
+    .
+    .
+    $PAGE_CONTENTS = ob_get_contents();
+    ob_end_flush();
+    .
+    .
+    include("header.inc");
+    echo $PAGE_CONTENTS;
+    include("footer.inc");     -There is no need for a final ob_end_flush() because script termination does that.
+</pre>
+</font>
+This method can be used to set the HTML <strong>title</strong> tag of a page which goes in the HTML HEAD section
+because the story title can be got first and then a variable set and used in the header generation 
+(e.g. in <font class="php_code">header.inc</font> to set the title.
+
+<a name="oscailt_ch4_introduction">
+<h2>4. Design Details </h2>
+This section describes the design in much more detail covering the various modules and classes.
+<a name="oscailt_ch4_1_">
+<h3>4.1 Layout, Module and Element Configuration </h3>
+The new configuration abilities for the site are by far the most important features of Oscailt 3.x. It allows you
+to define various types of site pages. These might be for example the 'newswire page'. Previously the layout
+was hard coded in each of the php files and the embedded html. With Oscailt 3.x, this is broken up into a
+collection of elements and modules, where <strong>elements</strong> are composed of things like: 
+<!-- Listings, categorylist, picture box, filter box, headlines box, links and static documents. -->
+<font class="oscailt_objs">
+<ul>
+<li> Listings
+<li> Categorylist
+<li> Picture box
+<li> Filter box
+<li> Headlines box
+<li> Links
+<li> Static documents.
+</ul>
+</font>
+While <strong> modules </strong> which are displayable objects, consist of things like:
+
+<!-- stories, comments, events, publisher, contact, archive, newswire, feature, gallaries, search and
+import and export RSS feeds.  -->
+<font class="oscailt_objs">
+<ul>
+<li> Stories
+<li> Comments
+<li> Events
+<li> Publisher
+<li> Contact
+<li> Archive
+<li> Newswire
+<li> Feature
+<li> Gallaries
+<li> Search 
+<li> Import RSS feeds 
+<li> Export RSS feeds 
+<li> <i>They can also include <strong>elements</strong></i>.
+</ul>
+</font>
+
+You can then define your own <u>versions</u> of each basic element and module type making various aspects of it 
+configurable. For example you could define various types of picture box element for different types of logo or
+you can have different headlines boxes for say different story types.
+<p>
+So you could configure for example two versions of the newswire module, where the first might be for 
+<u>press releases</u> and the second for <u>news stories</u>. The layout of each could then be different on the site 
+by associating each of them with a different layout page.
+<p>
+And this is where the <strong> modules</strong> form the bridge or connection with the <strong>layout</strong>
+elements. For the Indymedia Ireland site as of 2006, there are 5 basic layout elements:
+
+<!--     Vertical Menu, Horizontal Bar, Inset Box, Listing Box and Page Layout. -->
+<font class="oscailt_objs">
+<ul><li> Vertical Menu
+    <li> Horizontal Bar
+    <li> Inset Box
+    <li> Listing Box 
+    <li> Page Layout.
+</ul>
+</font>
+The <strong>Page Layout</strong> is key to understanding how the configuration works and what is done is that
+a different version of a page layout is designed for each of the page types that you want. In many ways this
+is the core part of the site layout configuration. So for example for <strong>page layout</strong> the following
+versions can be defined.
+<font class="oscailt_objs">
+<ul>
+    <li> Page Layout.
+    <ol>
+	<li> comments page
+	<li> plain page
+	<li> newswire page
+	<li> front page
+	<li> article view page
+	<li> documentation page
+    </ol>
+</ul>
+</font>
+<p>
+For the other layout objects there are similarly numerous different versions configured for them too.
+To help explain this the diagram below attempts to illustrate these relationships for the case of the 
+<i>article view page </i>layout. This is not an exact copy of any known site but it is close enough and
+serves our purpose here.
+<p align="center">
+<img src="page_layout.jpg" align="middle" alt="Fig 4: Relationship of elements and modules to page layout" >
+</p>
+To help explain what is going on here the diagram shows on the right what the final page will look like. It
+contains a header with some graphics, a side menu with various listings, a footer with a logo and an embedded
+box containing the words 'Related article links'. The basic predefined functionality of the page layout element 
+is that it allows you to select different Oscailt modules and elements for the <strong>header, left column,
+main page, right column </strong> and <strong>footer.</strong> It is not necessary to fill in all these
+so that in the article view page example here, there is no right column. The real flexibility comes from when you are
+selecting modules and elements to use for say your header or left column, you are able to select from all the
+different versions that you have already created for each of these module and element types. You can actually
+select other layouts too. An example might be where you define a horizontal bar layout and you use this for
+say your header.
+<p>
+In the diagram above, the layout object shows only a Header, Left Column, Main Body and Footer boxes, but ideally
+the example <u>should include</u> boxes for left-column <strong>and right-column</strong>.
+<p>
+For the other layout types, the options will be a bit different, but the general design approach is the same.
+<p>
+In the page layout administration page for the page object, the selection for the <strong>main body</strong> is not 
+for the main contents of the page, but for selecting things like the embedded 'code box'. 
+To <u>specify the main contents of the page</u>, you actually have to
+include or reference the page layout from the module. So in the example above, in the configuration for the
+<strong>article view module</strong> there is an option for <strong>Page Layout</strong> that is a drop-down
+list box and it contains a list of all the defined versions of <strong>Page Layout</strong> that you have created 
+for the site. So in effect, the layout -article view page sits there on it's own and is linked to by various modules.
+So for any of the newswire or feature modules, you would also select a page layout to use there.
+
+<a name="oscailt_ch4_1_1_">
+<h4> 4.1.1 How and Where Elements, Modules and Layouts are Implemented </h4>
+The Oscailt predefined modules and elements are implemented in two sets of files. The 
+<font class="php_file">*.xml </font> files contain all the labels, text, descriptions and options and link related 
+definitions. Separating them out makes it easy to create different language versions. 
+The <font class="php_file">*.inc</font> files contain the implementations and are subdivided into two main 
+directories <font class="php_dir">indyobjects</font> and <font class="php_dir">indydataclasses</font>. The files
+in the latter are partial implementations because the core part of the (common) functionality is derived 
+from various existing classes like: <font class="oscailt_objs"> indyBasicObject, indyListObject, indyMenuObject, indyNewswireObject</font> and <font class="oscailt_objs"> indySiteModuleObject</font>.
+A class tree showing the inheritance of these classes is given in a later section.
+<p>
+It should be noted that this is really only one half of the functionality of the element, module and layout 
+objects because the displayable parts are implemented in the <strong>runtime classes</strong>. These are described
+later in a later section.
+<p>
+So the basic directory and file structure for the elements and modules is:
+<font class="php_dir"> 
+<pre>
+    -- html
+	|
+        |____ objects
+        |         | 
+	|         |
+	|         |____ indyobjects   Files: indybasicobject.inc, indysitemodule.inc, indyobject.inc
+	|                   |
+	|                   |
+	|                   |______ <b>indydataclasses</b>
+        |                                   Files: indyarchive.inc indyarticle.inc indybar.inc indybox.inc
+        |                                          indycategorylist.inc ......   indysearch.inc indysite.inc 
+	|                  
+        |____ xmldata    
+                 |
+		 |_____ <b>indydatatypes</b>  Files: archive.xml article.xml bar.xml basic.xml box.xml
+		                              categorylist.xml ......   search.xml site.xml 
+  
+</pre>
+</font>
+The purpose of the code listed in the files (above) is to implement the interface with the administrative layout 
+of these objects and the building of the cached file versions of them. They contain the code that generates
+the code to startup and instantiate the corresponding runtime displayable objects of themselves including
+the setting of any parameters and settings and the subsequent calls to display them.
+<p>
+Clearly then to add any new functionality or changes to the Oscailt code requires both understanding
+and following this design pattern. However the benefits are that a fair amount of code is available for re-use.
+<p>
+<a name="oscailt_ch4_1_2_">
+<h4> 4.1.2 Storage of the Elements, Modules and Layout Objects</h4>
+The storage of the different <strong>versions</strong> of each of the user defined elements, modules and
+layouts is normally in the database in the MASTER_DATA_OBJECTS and DATA_OBJECTS tables. They can also be exported
+ to <font class="php_file">.xml</font> and <font class="php_file">.dump</font> files for sharing configurations 
+with other sites with Oscailt installed.
+When the data is stored in XML the data is contained under various tags along with the values selected originally 
+in the administration layout pages for those objects.
+<p>
+One can also think of these objects as also being stored in <font class="php_file">.inc</font> files in the form of
+the <strong>code cache</strong>, where they take the form of the generated code for displaying themselves,
+although it is not really useful here.
+<p>
+An attempt to illustrate the storage in the diagram below. Every instance of an object is stored in the 
+MASTER_DATA_OBJECTS table and then any language specific ones are stored in the DATA_OBJECTS table. So for example,
+if there are three different language versions,  say a English, French and Spanish version, then there will be
+3 entries in the DATA_OBJECTS table for that object id but only one in the MASTER_DATA_OBJECTS. 
+<p>
+For more details on this area, see the discussion in administration section below.
+<p align="center">
+<img src="object_storage.jpg" align="middle" alt="Fig 5: Predefined objects and admin created versions" >
+</p>
+<p>
+
+<a name="oscailt_ch4_2_">
+<h3> 4.2 Handling of URL Requests </h3>
+The next diagram or image briefly outlines how URL requests to the server are handled. As one should know, the URL 
+request is initially received by the Apache Server and depending on the Apache configuration and the contents of the
+<strong>.htaccess</strong> file in the local directory where the Oscailt (public website) installation resides,
+there can be various mappings of the URL request. Previously in Oscailt 2.x most requests were mapped directly to 
+PHP files, for 
+example to <font class="php_file"> index.php, newswire.php, features.php, latestcomments.php </font> and so on.
+<p>
+In Oscailt 3.x this has changed so that most requests are sent through the <font class="php_file"> index.php </font> file and they can then optionally, depending on the Oscailt configuration, be internally mapped. This is what is 
+illustrated below.
+<p align="center">
+<img src="url_requests.jpg" align="middle" alt="Fig 6: Request Handling" >
+</p>
+<a name="oscailt_ch4_2_1_">
+<h4> 4.2.1 Use of Oscailt Friendly URLs </h4>
+The use of <strong>friendly URLs</strong>, the <strong>.htaccess</strong> file and <strong>object ids</strong> are 
+all closely related in Oscailt 3.x. Because
+Oscailt 3.x has it's pages built up out of configurable objects, then in order to make it flexible, this means that
+internally a way has to be made to map your requests into specific object ids. 
+<p> The purpose of the <strong>Friendly URLs</strong> is to make this mapping easier. Therefore it is not really
+an option to not use them as it makes things harder otherwise. If you do not want to use friendly urls, then you 
+would also have to turn off the <i>rewrite</i> directives in the .htaccess file because what you would have to do 
+is have URLs like: 
+<blockquote>
+<i> www.indymedia.ie?obj_id=59</i> for say the newswire and <br>
+<i>www.indymedia.ie?obj_id=71</i> to the features page.
+</blockquote>
+Obviously users will not remember this. You could still map these in the .htaccess file by mapping say: 
+<u>newswire</u> to <u>obj_id=59</u> but that would not be very portable and it is external to Oscailt too.
+<p>
+So hence the idea of friendly URLs was to keep this mapping internal to Oscailt and allow it to be managed from
+there, so long as all requests are mapped to the <font class="php_file"> index.php</font> page. So at the moment 
+something like the newswire gets re-mapped by Apache via a directive in .htaccess to 
+<b><i>index.php?redirect=newswire</i></b>.
+This is done automatically from the rule in .htaccess (<i>Check the default .htaccess file in the Oscailt cvs or 
+installation.</i>)
+<pre>
+       RewriteRule ^(.*)$ index.php?redirect=$1 [QSA]
+</pre>
+This rule appears after all the other rules for mapping the admin pages and basically says: If none of the other
+rules are matched then all other URL requests have this rule applied.
+<p>
+As already mentioned above, many of the <strong>administration URLs are NOT mapped to index.php</strong> and remain 
+directed to their respective php files like: <font class="php_file"> admin.php, viewsitelog.php </font> All the
+site layout and module definition functionality is handled through <font class="php_file"> admin.php</font> requests
+using a relatively large set of request parameters.
+
+<a name="oscailt_ch4_2_2_">
+<h4> 4.2.2 Implementation of Oscailt Friendly URLs </h4>
+When a request is received and the <font class="php_file"> index.php</font> file is called, one of the first
+actions is to carry out the friendly URL mapping. On entry the <font class="php_file"> oscailt_init.php</font>
+file is included. This loads up the various object definitions, creates instances of objects. Back in the
+<font class="php_file"> index.php</font> file, the list of redirects is loaded (from a file in the cache) and
+then this list is searched by making a call to the function <font class="php_code"> getRequestTargetObjectID</font> 
+(found in <font class="php_file">objects/utilities.inc</font>) which looks for a match for the entry in the 
+request for say: <strong>newswire </strong> or <strong>features</strong>, mapping it to an object id which is 
+returned by this function. 
+<p>
+Given the object id, the code can now load up the object from the code cache for this id. This leads us naturally
+onto the next section on the code cache below.
+<a name="oscailt_ch4_2_3_">
+<h4> 4.2.3 Limitations of Oscailt Friendly URLs </h4>
+Currently it is not possible to setup directory type addresses with the Oscailt Friendly URLs because the '/' 
+character is the separator. This affects the organisation of static pages. So for example if you wanted to setup this
+link  <i>www.indymedia.ie/videos/seattle</i>, it would not be possible, even though the existing site allows
+this link: <i>www.indymedia.ie/arcticle/1234</i>. The reason this is allowed is because the article module expects
+to find the story id after it. The static document module would need to be modified to search for subsequent
+paths and or the code implementing the friendly URLs would need to change.
+
+<a name="oscailt_ch4_3_">
+<h3> 4.3 The Code Cache </h3>
+Another new feature of Oscailt 3.x is the introduction of the code cache. It is as explained above, a sort of quasi
+compiler designed to help speed up execution by avoiding all the overheads each time for the file includes and
+generation of php code.
+When each module instance is created and configured an entry is made in the code cache. These files reside in the 
+<strong>/html/cache/objectcache/objectstore_xx/</strong> directory. The path is configurable, but there is no
+good reason to change it.
+<p>
+Whenever a change is made to one of the modules the system will continue using the version in the code cache.
+Therefore the entry has to be refreshed and this is the purpose of the <strong>re-cache</strong> option that
+is available in the administration section where modules can be edited. When you update a module it will ask
+you do you want to update it to the live site. This simply means do you want to automatically update the code
+cache for that particular module. Sometimes re-cache is referred to as <strong>re-publish</strong>.
+<p>
+The contents of any given code cache file, depend on the module type cached. If it is a page layout object,
+it will contain code to include the code cache files for the top menu bar, the right and left columns, any
+insets in the central section and an include for the footer cache. The page layout also uses the 
+<strong>$PAGE_CONTENTS</strong> variable and outputs that as part of it's stream at the point where it has
+reached the central section. This is after the top bar and left column have been generated. After the central
+section also known as the main body is outputted (or generated), then the right column and then footer are done.
+It basically follows the sequence for drawing the table in chapter 3.
+<p>
+The cache files for the other modules like the newswire module will contain generated PHP code to create an
+instance of the newswire module and then further calls to that object which will set all the values selected
+in the administration layout pages for that module. It will also have the code to call the <font class="php_code">
+display()</font> function of the newswire module.
+<p>The code cache will also contain additional code for checking whether an editor is logged, so as to display
+additional data.
+<p>
+<a name="oscailt_ch4_3_1_">
+<h4> 4.3.1 Building the Code Cache </h4>
+The code cache is generally fully built for all objects during installation and can also be done through the
+<strong>Clear Cache</strong> administration page. It can also be done individually for each object by clicking
+the <strong>re-publish</strong> link or by ticking the live-site box during object save in the layout page.
+<p>
+In the code it is implemented in the <font class="oscailt_objs">indyObjectSet</font> class in the functions
+<font class="php_code">rebuildCaches(), updateObjectCaches()</font> and <font class="php_code">buildObjectCacheFiles</font>. The first function is used for building the full code cache of a site, whereas the last one does most of
+the real work. A 'site' contains objects and would Oscailt you can define your website into different sites mainly
+for the sake of just organising your objects. For example RSS feeds could be defined in a RSS site.
+<p>
+When the cache is being built it has to ensure the directory is created, determine whether there are language
+specific versions to be built, and check whether it references a page layout object. If it does, then it has 
+to get the object id of the page layout object and load it, and call the <font class="oscailt_objs">fill()</font> 
+function of the <font class="oscailt_objs">indyPage</font> class. Otherwise it calls the 
+<font class="oscailt_objs">getHTML()</font> function of it's own class. This returns generated PHP code for
+instantiating itself, setting values and calling display functions.
+
+
+<a name="oscailt_ch4_3_2_">
+<h4> 4.3.2 File Organistation in the Code Cache </h4>
+The files in the code cache are PHP include files and are named according to their object id. They are divided into 
+a set of sub-directories with up to 50 objects per directory. This value is configurable. The directories are
+stored as <strong>html/cache/objectcache/objectstore_n/</strong>. 
+The directory number <strong>'n'</strong> in objectstore_n is actually calculated as:
+<pre>
+     <font class="php_code"> ( object_number / 50) - 1 </font>
+</pre>
+The idea is to spread the objects out into several directories rather than have hundreds in one directory.
+<p>
+So for an object id of <strong>'2'</strong>, this becomes: <strong>cache/objectcache/objectstore_0/2.inc</strong> 
+and for object id <strong>'52'</strong>, it is <strong>cache/objectcache/objectstore_1/52.inc</strong>. 
+<p>
+The directory structure is shown here for clarity.
+<font class="php_dir"> 
+<pre>
+    -- html
+        |____ attachments
+        |____ cache 
+	|         |_______ objectcache
+	|                       |_______ objectstore_0    (for objects ids  1 - 49 )
+	|                       |_______ objectstore_1    (for objects ids 50 - 99 )
+	|                       |_______ objectstore_2    (etc )
+	|                       |_______ ...
+	|                       |_______ objectstore_n
+        |____ ....
+        |____ graphics
+        |____ logs
+        |____ objects
+        |____ xmldata
+</pre>
+</font>
+
+<a name="oscailt_ch4_3_2_1_">
+<h5> 4.3.2.1 Organistation by Language </h5>
+For every object in the code cache, there are at least 2 files and more when more than one language is in use.
+The main file is named as described above according to the object id. The second and subsequent files are named using
+the object_id and the language two character code. (e.g. en for English). 
+<p>
+So for example for the object with an object id = 14, there will be two files present named
+<font class="php_file">14.inc </font> and <font class="php_file">14_en.inc </font> where the <strong>14.inc</strong> 
+will contain just one line which includes the other file <strong>14_en.inc</strong> when <u>only one language is
+in use for that object</u>.
+<p>
+If there was an English (en) and Spanish (es) version of this object, then you would have three files:
+<font class="php_file">
+<pre>
+    14.inc 
+    14_en.inc
+    14_es.inc
+</pre>
+</font>
+The code now in the <font class="php_file">14.inc </font> file would have to check the language type (got in the 
+request) and then based on the result load the appropriate language specific version. Thus the code is now:
+<font class="php_code">
+<pre>
+     global $userLanguage;
+     $langCode = $userLanguage-&gt;getLanguageCodePrefix();
+
+     if($langCode=="es") 
+         include("cache/objectcache/objectstore_0/14_es.inc");
+     else 
+         include("cache/objectcache/objectstore_0/14_en.inc");
+</pre>
+</font>
+The more languages then the more if-statements.
+<p>
+<p>
+<a name="oscailt_ch4_4_">
+<h3> 4.4 More on Handling Requests and the Code Cache </h3>
+When a request is received, there is an initial check to see if the Object Id <u><i>obj_id</i></u> is included and if
+not then a value is retrieved which will default to using the <i>front_page_id</i> from the system configuration.
+<p>
+The use of the code cache is controlled by the setting of the system configuration parameter 
+<strong><i>use_live_objects</i></strong> which defaults to false, so that the code cache is used by default.
+If the code cache is not in use, then the sequence of execution through the <font class="php_file">index.php</font>
+file is different because it has to load the objects directly and get them to generate their combined blobs of HTML
+and PHP and then execute that. The key object that handles that mode of execution is the 
+<font class="oscailt_objs">indyObjectManager</font> class with a call to the method (function)
+<font class="oscailt_objs">getLiveObjectHTML</font> doing most of this work.
+<p>
+
+<a name="oscailt_ch4_4_1_">
+<h4> 4.4.1 Execution of index.php and Loading of Code Cache Objects </h4>
+
+On entry to <font class="php_file"> index.php </font> the <font class="php_file">oscailt_init.inc </font> file is
+included and executed. It mainly includes all the definitions of the object classes that will be used and reads
+configuration data for redirects, configuration data and other key settings.
+<p> 
+After that a function call is made to <font class="php_code"> getRequestTargetObjectID</font> to retrieve 
+the object id out of the redirect mapping (see section above on <a href="#oscailt_ch4_2_1_">Friendly URLs</a>).
+<p>
+<a name="oscailt_ch4_4_1_1_">
+<h5> 4.4.1.1 First Cached File: Displayable Runtime Module</h5>
+The code is then ready to read the cache files and the name and path to the first one is derived using the utility 
+function <strong><font class="php_code">getObjectCacheIndexFile</font></strong>. It builds these up from 
+configuration settings and using the value of the <u>object id</u> in the manner described in the previous section.
+<p>
+The first cache file is always a display runtime module like a newswire, feature, article, event or a static page.
+This must have a variable called <strong>$PAGE_LAYOUT_ID</strong> defined and set in it and this is the object id
+of the page layout in which this displayable page sits.
+<p>
+It is <u>important to note</u> that as each file is included the PHP code in it is executed at that point.
+
+<a name="oscailt_ch4_4_1_2_">
+<h5> 4.4.1.2 Second Cached File: Page Layout Module</h5>
+Once the first cache file is included (and executed) the path and filename to the second cache file is determined
+from the value of <strong>$PAGE_LAYOUT_ID</strong>. This will always be a reference to an Oscailt <strong>page 
+layout</strong> object -defined in the administration layout pages. A set of these are automatically imported during
+a full install of Oscailt.
+<p>
+This cache file will very likely include multiple include statements in it for including the top menu/banner,
+the left and right columns, any inset objects and the footer. These are all objects in their own right and
+therefore have cache files of their own.
+<p>
+The final task of <font class="php_code">index.php</font> is to include the s these up from 
+<font class="php_code">oscailt_destroy.inc</font> to close any database connections and
+<font class="php_code">footer.inc</font> to simply output the final closing BODY and HTML tags of the page.
+
+
+<a name="oscailt_ch4_4_2_">
+<h4> 4.4.2 Execution Sequence for a Request in Live (Non Cached) Mode</h4>
+In the cached mode of execution blobs of HTML and PHP code have been effectively created and stored in the cached 
+file for the creation and calling of the display runtime modules and then associated page layout modules.
+<p>
+When operating in live mode, these steps are postponed until this point and effectively (see below), it is the
+calls to <font class="php_code"> indyObjectManager</font> and 
+<font class="php_code">indyObjectManager-&gt;getLiveObjectHTML</font>
+that implement the sequence of execution effectively done for the re-publish stage during site layout.
+So understanding the execution in live mode, is really the same as understanding the generation of the cache.
+<p>
+The main sequence of execution in summary form then are:
+<p>
+<blockquote>
+<font class="php_code"> 
+<pre>
+     1.  Get Obj Id or default it from system config value.
+
+     When operating in cache mode (<i>Default Case</i>)
+     2.  Get the path and filename for that object id
+     3.  Include the cached file of that object id and execute the PHP in it.
+     4.  The cached file holds a value for the PAGE_LAYOUT_ID (of the layout module used by the original Obj Id)
+     5.  Get the path and filename for the value of the PAGE_LAYOUT_ID
+     6.  Include the header.inc file which contains the HEAD tag for the page.
+     7.  Include this second cached file for the PAGE_LAYOUT_ID and execute it.
+     8.  Include oscailt_destory.inc to close the database connection.
+     9.  Include footer.inc to close the final HTML tags
+     <i>Finished</i>
+
+     When NOT operating in cache mode
+     2.  Create instance of <strong>indyObjectManager</strong>
+     3.  Call <strong>indyObjectManager->getLiveObjectHTML</strong> with Obj Id.
+         <i>--- Inside getLiveObjectLive() ---</i>
+     4.       Create indyObjectSet
+     5.       Call <strong>indyObjectSet->load</strong>
+     6.       Check <strong>indyObjectSet->containsObject</strong>  -it should.
+     7.       Fetch the original input object id via a call to <strong>indyObjectSet->fetchObject</strong>
+              If it can't fetch it an error is thrown.
+
+     8.       Get the Page Layout reference for this via a call to <strong>indyObjectSet-&gt;getPageLayoutRef</strong>
+	      Note: This object is of type <strong>indyBasicObject</strong> or at least one inherited from it. 
+              See the class relationships below for more background to this.
+
+     9.       If a valid Page Layout reference was returned in step 8. <b>and</b> is of type 'page' 
+              THEN
+              i.    Get the layout object for this layout reference via a call to <strong>indyObjectSet->fetchObject</strong>
+              ii.   Retrieve object 'stub' via call to <strong>obj_set->itemcollection[] </strong>
+              iii.  Get site Id (from stub)
+              iv.   Get object html via a call to <strong>$layout_obj->fill($indy_obj, $this->obj_set, $site_id, true);</strong>
+              v.    Return object html retrieved above back to index.php
+         <i>--- Outside getLiveObjectLive() ---</i>
+     10. Evaluate the HTML + PHP blobs returned above.
+
+     ---- Now do the same all over again except using the $PAGE_LAYOUT_ID to access the page layout objects.
+
+     11. Create instance of <strong>indyObjectManager</strong>
+     12. Call <strong>indyObjectManager->getLiveObjectHTML</strong> with $PAGE_LAYOUT_ID
+         <i>--- Inside getLiveObjectLive() ---</i>
+              Do same steps as 4. to 8. except 9. will not return a valid page reference since the current 
+              object is one. It will then do instead:
+     13       Call <strong>getHTML()</strong> using $this-&gt;obj_set as a parameter. This will call a cascade of getHTML() function
+	      calls for the full object set. -i.e. the set of all objects contained in the page which means
+              the top bar, left and right columns, insets and footer objects.
+     14.      Return object html retrieved in <b>step 13.</b>
+         <i>--- Outside getLiveObjectLive() ---</i>
+
+     15.  Execute the returned html (see note below) retrieved in either step 14 via a call to PHP <strong>eval</Strong>
+     16.  Include oscailt_destory.inc to close the database connection.
+     17.  Include footer.inc to close the final HTML tags
+     <i>Finished</i>
+</pre>
+</font>
+</blockquote>
+<strong>Note:</strong> This HTML returned is not really HTML. It is more a case of a mixture of PHP code and
+HTML and as pointed out in step 15, it is then executed via the PHP function <strong>eval</strong>. One of the
+reasons this is done is because since a given page is composed of objects, -i.e. a particular layout object
+containing various modules and elements, it is necessary to build up the PHP code to deal with this, because
+this can't be determined in advance since all the pages can be <strong>dynamically</strong> rather than
+<strong>statically</strong> built.
+<p>
+So the <strong>high level sequence of execution</strong> in a certain sense is:
+<blockquote>
+<font class="php_code"> 
+<ol>
+<li> Run the PHP for dealing with the meta level of finding the correct layout object and getting all the contained
+modules and elements.
+<li> Create the PHP code that will execute these objects, retrieve data and display data.
+<li> Execute the PHP in step 2. to generate the HTML for the client.
+</ol>
+</font> 
+</blockquote>
+In the case of a request like:
+<blockquote>
+<strong>www.indymedia.ie/article/83112</strong> which is a request to a particular story 83112
+</blockquote>
+The <strong>article</strong> is mapped via friendly URLs to it own object id, say 53. The first code cache
+file which will be <font class="php_file">53_en.inc</font> will contain the PHP code to create an instance
+of the <font class="oscailt_objs">ArticleDisplay</font> class and the value of the variable 
+of the <font class="php_code">$PAGE_LAYOUT_ID</font> will be set to the <i>ObjId</i> of the PAGE module used.
+The <strong>83112</strong> part of the request is then used later by the instance of 
+<font class="oscailt_objs">ArticleDisplay</font> to retrieve the corresponding story from the database and
+display it.
+<p>
+It should be noted that other instances of the <strong>ArticleDisplay module</strong> created in the layout
+section of the Administration screens <strong>can be assigned to different page layout modules.</strong>
+<br>
+
+<a name="oscailt_ch4_5_">
+<h3> 4.5 File Organisation </h3>
+This section gives a brief overview of the organisation of php (and inc) files in Oscailt and overlaps to some 
+degree with other sections. It can greatly help in the understanding of the code to know where to find files and
+which are the important ones for given areas of functionality.
+<p>
+The files are broadly organised according to what they do, by the directories where they reside.
+
+<font class="php_file">
+<pre>
+  html  -This directory contains index.php and many of the basic administration functionality files.
+    |    It also includes various header and footer files and other miscellaneous files.
+    |
+    --------- config - Self explanatory.
+    |
+    |
+    --- objects  -This directory generally retains the core functionality as in Oscailt 2.x for story, 
+    |        |    comment, attachment, calendar, editor functionality (as in related to managing stories 
+    |        |    and comments) and other things like utilities and database and system config.
+    |        |   
+    |        |   
+    |        |   
+    |        --- indyobjects - This contains core functionality and most of the abstract classes too. 
+    |        |        |        These classes or objects are used to pull everything together and one of 
+    |        |        |        the main objects <strong>indyObjectManager</strong> is used in live mode by index.php
+    |        |        |        and it is used heavily in the object layout administration pages along with
+    |        |        |        the other classes implemented here.
+    |        |        |
+    |        |        |
+    |	     |        ------ indydataclasses
+    |        |                   - This contains files like indyarchive.inc, indyarticle.inc
+    |        |                     generally of the form indyModuleName.inc
+    |        |                     The are used for helping generate the object settings in the cache files
+    |        |                     and form a link between the object layout administration and the runtime side.
+    |        |
+    |        |
+    |        --- indyruntime - This contains the runtime display functionality for all of the displayable modules,
+    |        |                 like newswire, articles, events etc.
+    |        |
+    |        |
+    |        --- feedexport  - This contains the files for implementing RSS and Atom feeds and their display.
+    |        |
+    |        --- magpie      - Files from the Magpie code base used for parsing RSS files.
+    |
+    |
+    --------- xmldata
+                |
+		--- indydatatypes - These contain XML definitions of all the configurable object types; 
+                | 		    elements, nodules and layouts. These files can be language specific
+		|		    to enable different language versions of the object layout administration
+	        |		    pages.
+                |
+		--- itemcache     - These contain tiny files for defining the text and icon to use for the
+				    list of editorial action buttons for edit, hide, delete, etc.
+				    They are here because they can be made language specific.
+</pre>
+</font>
+Only the <font class="php_dir">html</font> and <font class="php_dir">config</font> directories contain .php
+files and all the others contain .inc files.
+<p>
+The files in the directory <font class="php_dir">indydataclasses</font> generally only contain supporting classes 
+and methods usually for handling things in the display aspect such as titles and strings of various kinds.
+They also they tend to all follow the class inheritance tree of:
+<font class="oscailt_objs">
+<pre>
+indyObject
+     indyBasicObject             -This is one of the main classes.
+          indySiteModuleObject
+</pre>
+</font>
+
+<a name="oscailt_ch4_6_">
+<h3> 4.6 Classes and Class Hierarchy </h3>
+This section only covers the most important classes in Oscailt that are really needed to understand the core
+design and workings of it. There are many other peripheral classes that are not mentioned here and are quite
+self explanatory. 
+<P>
+The full set of classes can be found in the <a href="the_output/classtrees_default.html">class tree</a> generated by the 
+<a href="http://www.phpdoc.org">phpDocumentator 1.3.0</a> that was run against the Oscailt source code.
+<p>
+<b>Note:<i>The code needs to be updated with tags readable by phpDocumentator to describe what each class
+	and function does and which phpDocumentator will then be able to use in its output</i> </b>
+<p> The overall structure which is common to object oriented design is to create a few basic and relatively
+abstract classes and to derive more useful ones from those thereby building up the functionality.
+For a quicker primer on classes and object design see section 
+<a href="#oscailt_ch14_introduction">Appendix A - Some Background on Objects, Classes, Functions and Methods</a>
+below.
+<p>
+<b>Note:</b> Some files may define and implement two or more classes each.
+
+<a name="oscailt_ch4_6_1_">
+<h4> 4.6.1 Runtime Display type Classes </h4>
+This first set covers the <b>display</b> classes and as can be seen the root class here is: 
+<b><font class="oscailt_objs">displayObject</font></b> and therefore quite important to understand in order to 
+understand the rest. If you look at the file sizes in the <font class="dirpath">objects/indyruntime</font>
+directory, one can see clearly that each class all have significant additions of code to the base class in the root 
+class treee. This basically means <font class="oscailt_objs">displayObject</font> class doesn't do everything.
+The main job of it is to read 'Display' options and settings generated during the layout phase and to create an 
+instance of the <strong>story query</strong> in the function <font class="oscailt_objs">processRequest</font>.
+The other tasks are to provide the basic set of functions for generating next and previous links used on the 
+newswire pages and headers and footer sections.
+<font class="oscailt_objs">
+<pre>
+    <b>displayObject</b>
+        |
+        |------- contactDisplay
+        |------- feedimportDisplay
+        |------- filterDisplay
+        |------- preferencesDisplay
+        |------- siteFilteredDisplay
+                       |
+                       |----------- categorylistDisplay
+                       |----------- commentsDisplay
+                       |----------- eventsDisplay
+                       |----------- feedExportDisplay
+                       |----------- managingDisplay
+		       |		 |
+                       |                 |---------- newswireDisplay
+                       |                 |              |
+                       |                 |              |--------- archiveDisplay
+                       |                 |              |--------- attachmentBearingDisplay
+                       |                 |                               |
+                       |                 |                               |--------- articleDisplay
+                       |                 |                               |--------- featureDisplay
+                       |                 |---------- galleryDisplay
+                       |
+                       |
+                       |----------- publishDisplay
+                       |----------- searchDisplay
+
+
+</pre> </font>
+Any classes with 'feed' in the name generally refer to the RSS related functionality. A glance at the above
+tree would indicate that <font class="oscailt_objs">siteFilteredDisplay, managingDisplay</font> and
+<font class="oscailt_objs">newswireDisplay </font> are the most important ones to understand since other classes
+are derived from them.
+<p>
+The <strong>siteFilteredDisplay</strong> class handles the filters that can be used on displays like the newswire 
+and stories.  These filters are the <strong>language, topic, region</strong> and (story) <strong>type</strong>
+<p>
+The <strong>managingDisplay</strong> class handles functionality related to managing the display object, some
+of which relates to editor management. This covers things like the ability to <strong>edit, hide, unhide, clip, 
+delete</strong> and <strong>lock</strong>. It also covers the display of any of the related 'confirm' type dialogue 
+boxes related to these actions.
+It works in conjunction with the class <font class="oscailt_objs">itemAction</font>. The key functions in 
+<strong>managingDisplay</strong> are:
+<font class="oscailt_objs">
+<pre>
+    <b>managingDisplay</b>-&gt;processRequest() -calls processRequest() of displayObject first and then executes
+                                       it the code in it's own implementation of this function.
+				       When an editorial action is confirmed (.e.g. hide), then this function will
+				       make a call <b>execute()</b> in class <b>itemAction</b>.
+
+		   -&gt;getItemActions() -this function generates and returns the HTML code for display the editorial
+		                       actions for edit, hide, delete etc.
+</pre>
+</font>
+<p>
+The <strong>newswireDisplay</strong> class deals largely with displaying headlines and story summaries and their 
+associated details on the newswire. This means most of its methods (functions) are concerned with writing headers, 
+footer, links, titles, summaries etc. It has to make calls to retrieve the stories and other calls for getting 
+attachments and generating thumbnails (of images). The most significant functions are:
+<font class="oscailt_objs">
+<pre>
+    <b>newswireDisplay</b>-&gt;display() -This is the main function used for the newswire module(s) and it calls
+                                in turn thses functions -the lesser ones have been left out for clarity
+                                -&gt;setQueryOptions() 
+                                -&gt;query-&gt;execute()     - This executes the SQL query to retrive the story data.
+                                -&gt;writeNewswireHeader() 
+                                -&gt;writeStorySummaries()
+				-&gt;writeNewswireFooter() 
+
+		   -&gt;retrieveHeadlines() -this function is only used by the <b>headlineBox</b> module
+</pre>
+</font>
+
+<p>
+One might expect the two classes <strong>articleDisplay</strong> and <strong>featureDisplay</strong> to be
+derived from <strong>managingDisplay</strong> directly, but for some reason (not yet clear why) they are not.
+It seems that since they both can display attachments, then they need to include that functionality so they
+extend the <strong>attachmentBearingDisplay</strong> class.
+<p>
+The class <strong>attachmentBearingDisplay</strong> is used when displaying stories and comments
+to display the attachments. Attachments cover images, video and audio. It will look after any of the associated
+links and text, including editorial actions like edit, hide, delete etc. The key functions to be aware of are:
+<font class="oscailt_objs">
+<pre>
+    <b>attachmentBearingDisplay</b>-&gt;writeAttachmentList() -handles a list of attachments. Default is up to 5.
+                            -&gt;writeAttachmentLinks() -writes the link info for each attachment.
+</pre>
+</font>
+<a name="oscailt_ch4_6_2_">
+<h4> 4.6.2 More about Runtime Classes and Core Oscailt Classes</h4>
+When a story is selected or clicked on by a user and needs to be displayed, ultimately an instance of the core
+classes <font class="oscailt_objs">Story</font> and <font class="oscailt_objs">StoryQuery</font> is created
+from within inside an instance of the <font class="oscailt_objs">articleObject</font> class which is derived from
+the base class <font class="oscailt_objs">displayObject</font>. In the <strong>display()</strong> method, the
+<strong>articleDisplay</strong> object creates an instance of the story given the story id which would have
+been in the original request URL.
+<p>
+The <font class="oscailt_objs">Story</font> and <font class="oscailt_objs">StoryQuery</font> classes originate
+from Oscailt 2.x and are at the very core of the original Oscailt design. In this regard then, the key classes at 
+the very heart of Oscailt are:
+<ul>
+<li> <font class="oscailt_objs">StoryQuery</font> -Handles retrieve of stories for newswire and individual stories
+and their (multiple) comments and attachments.
+<li> <font class="oscailt_objs">Story</font> -Implements the Story class and any associated functionality
+<li> <font class="oscailt_objs">Comment</font> -Same as above but for comments.
+<li> <font class="oscailt_objs">Attachment</font> -Same as above but for attachments.
+</ul>
+<p>
+To clarify further how the runtime classes are called, a <strong>code fragment</strong> from one of the <strong>
+cache files</strong> is shown below.
+It should be remembered that the first code cache file loaded will be a displayable module. In this example below
+it is for object id which in this case is a featureModule. For a newswire module the first line would be:
+<strong>new newswireDisplay</strong> instead.
+<font class="php_code">
+<pre>
+     $site_module = new featureDisplay(54); 
+
+     $site_module-&gt;setFilters(Array("*"), Array("*"), Array("*"), Array("1"), Array(""));
+     $object_display_settings = Array of object ids and object names.
+     $site_module-&gt;setSiteSettings($object_display_settings);
+     $site_module-&gt;setAdminOptions(Array( ... of titles, labels, flags and other text settings and their values...));
+     $site_module-&gt;setUserOptions(Array( ... of module options set in layout phase, consists of values and booleans ...));
+
+     $site_module-&gt;processRequest();
+</pre>
+</font>
+<p>
+
+<a name="oscailt_ch4_6_3_">
+<h4> 4.6.3 Class Tree for the Abstract Indy Classes </h4>
+This next set of classes constitutes the other major group of classes in Oscailt 3x. These cover the more abstract
+ones which largely but not exclusively deal with the elements, modules and layouts and their management and
+administration of them. In general they have functionality that bridges the administrative and (public) site 
+display sides. Thus you will find functions dealing with XML files, getting and setting various options, processing
+the administration layout pages request and forms, building cache files including functions for returning blobs of 
+HTML as part of this task.
+<p>
+In this group, the root class is: <b>indyObject</b> and all these classes are defined
+and implemented in the files of similar name in the directories <font class="dirpath">objects/indyobjects</font>
+and <font class="dirpath">objects/indyobjects/indydataclasses</font>. 
+
+</pre>
+<font class="oscailt_objs">
+<a name="class_indySiteModuleObject">
+<pre>
+    <b>indyObject</b>
+        |
+        |------- o AdminPageObject
+        |------- o indyBasicObject
+        |            |---------- + indyCitylistObject
+        |            |---------- + indyCodeboxObject
+        |            |---------- + indyContentObject
+        |            |---------- + indyDocumentObject
+        |            |---------- + indyLinkObject
+        |            |---------- + indyListObject
+        |            |                  |------------ # indyMenuObject
+        |            |                  |                   |---------- * indyBarObject
+        |            |                  |                   |---------- * indyBoxObject
+        |            |                  |
+        |            |                  |------------ # indyPageObject
+        |            |
+        |            |---------- + indyPictureboxObject
+        |            |---------- + indySiteModuleObject
+        |            |                  |------------ # indyArchiveObject
+        |            |                  |------------ # indyArticleObject
+        |            |                  |------------ # indyCategorylistObject
+        |            |                  |------------ # indyCommentsObject
+        |            |                  |------------ # indyContactObject
+        |            |                  |------------ # indyEventsObject
+        |            |                  |------------ # indyFeedexportObject
+        |            |                  |------------ # indyFeedimportObject
+        |            |                  |------------ # indyFilterboxObject
+        |            |                  |------------ # indyGalleryObject
+        |            |                  |------------ # indyHeadlineboxObject
+        |            |                  |------------ # indyNewswireObject
+	|            |                  |                      |
+        |            |                  |                      |---------- * indyFeatureObject
+        |            |                  |
+        |            |                  |------------ # indyPreferencesObject
+        |            |                  |------------ # indyPublishObject
+        |            |                  |------------ # indySearchObject
+        |            |
+        |            |------------ + indySiteObject
+        |
+        |------- o indyDataCollection
+        |------- o indyDataType
+        |------- o indyDataTypeSet
+        |------- o indyImportExport
+        |            |
+        |            |---------- + indySiteExporter
+        |            |---------- + indySiteImporter
+        |
+        |------- o indyItemSet
+        |------- o indyObjectActionRequest
+        |------- o indyObjectManager
+        |--------o indyObjectNameCache
+        |--------o indyObjectRef
+        |--------o indyObjectSet
+        |--------o indyObjectStub
+
+</pre>
+</font>
+You can browse these classes and view the functions named contained in them by viewing the 
+<a href="the_output/classtrees_default.html">class tree</a> generated by the phpDocumenator.
+<p>
+The root class <strong>indyObject</strong> has very little in it and merely contains some functions for 
+setting and writing error messages, but they are in this class because they are needed by all the other
+indy classes.
+<p>
+There are far more classes derived from the base class here than from the <font class="oscailt_objs">displayObject 
+</font> class in the runtime classes group. For these classes, it is worth concentrating on the 
+<b>AdminPageObject, indyBasicObject, indyObjectActionRequest</b>
+and <b>indyObjectManager</b>. The AdminPageObject is covered later in the section on Administration 
+functionality.
+<a name="oscailt_ch4_6_4_">
+<h4> 4.6.4 The IndyBasicObject Class and It's Derivatives</h4>
+Class <font class="oscailt_objs">indyBasicObject</font> is important because there are so many other classes 
+derived from it, especially <b>indyListObject</b> and <b>indySiteModuleObject</b> and all of it's derivatives.
+It is also one of the biggest files in Oscailt and therefore implements quite a lot of code. It has most of
+the functions needed for implementing the administration layout of objects, the reading and loading of XML files
+and objects from the database, getting contained objects, updating and writing, generation of strings, headers,
+footers, HTML blocks, validating inputs (from layout forms), drawing layout forms, handling form rules and so forth.
+<p>
+<a name="oscailt_ch4_6_4_1_">
+<h5> 4.6.4.1 The IndyListObject Class and It's Derivatives </h5>
+This class <font class="php_file">objects/indyobjects/indydataclasses/indylist.inc </font> contain functions
+(methods) mainly for dealing with lists. It appears to handle lists that are used in HTML forms and also handles
+lists of objects. The latter is for use in the administration for the site layout but also for the site display. 
+For example you may have a list of links in a menu or down the side of your front page. 
+<p>
+Some of the functions in this create javascript, HTML form data and options, hidden variables in HTML forms, 
+various table headers and footers used in the administration site layout display. It also details with lists 
+in a generic way.
+<p>
+<!--
+The full list of methods generated by phpDocumentator is at:
+<a href="the_output/default/indyListObject.html">indylist</a>
+-->
+<p>
+For example the class <font class="oscailt_objs">indyMenuObject</font> derived from it has just two methods which
+are the constructor: <font class="php_code">indyMenuObject()</font> and <font class="php_code">getHTML()</font>.
+The <strong>getHTML</strong> method as with most other versions of this function in other objects is used for
+returning a mixture of HTML and PHP code. This is usually what gets cached. In this case for the menu object.
+A typical use then would be say for the case of the front page which is composed of various objects. It appears
+the indyObjectManager is used to load all the objects contained or that go to make up this page and for each of these
+the </strong>getHTML</strong> method is called and then that can be used to display the HTML for each of those
+objects thereby solving the dynamic configuration problem.
+<p>
+So the beginnings of how the relationships exist between the objects via the layout and module configuration 
+can now be seen on how this is reflected in the code and the way the code caching works and the caches for
+each object are included.
+
+
+<a name="oscailt_ch4_6_4_2_">
+<h5> 4.6.4.2 The IndySiteModuleObject Class and It's Derivatives </h5>
+This class <font class="php_file">objects/indyobjects/indysitemodule.inc </font> along with the class
+<font class="oscailt_objs">indyBasicObject</font> from which it is derived, form the basic root of most of the
+core classes for tangible objects in Oscailt. However there are two parts to these which are a) the configuration
+and b) management side which these classes implement and the display side which are covered in the implementations
+in the files in <font class="php_file"> html/objects/indyobjects/indyruntime</font>. 
+<p> 
+The class <font class="oscailt_objs">indySiteModule</font> has functions for generating PHP stubs 
+(or fragments of code) that go in the code cache and are used as part of the site layout configuration 
+in the administration system. The classes derived from it have few functions too but nearly all implement the
+following methods.
+
+<font class="php_code">
+<pre>
+    <b>getPageSettingArray </b>
+    <b>getFullPageSettingPHP </b> -<i>This generally calls the next two functions </i>
+       <b>assembleUserOptionString </b>
+       <b>assembleAdminOptionString </b>
+    <b>getHTML </b>
+</pre>
+</font>
+In fact, the bulk of the functionality is back in <font class="oscailt_objs">indyBasicObject</font> class.
+
+<a name="oscailt_ch4_6_5_">
+<h4> 4.6.5 The IndyObjectManager Class </h4>
+Understanding this class is essential because it is the glue that ties together the display side and the more
+abstract parts of Oscailt's architecture which includes the code cache, object management and dynamic configuration.
+<p>
+The functions in the class are primarily used for <u>getting</u>, <u>loading</u> and <u>writing.</u> and
+are used to pull everything together and as the name suggests, it manages objects.
+The main purpose of this object is to allow multiple objects to be loaded and manipulated and that can be for
+display when used in <strong>live mode</strong> through the file <font class="php_file">index.php</font>
+or for executing the main tasks of the dynamic configuration in the administration module layout screens or
+even for the import and export functionality.
+<p>
+It has a number of functions for helping with the drawing/generating of the main administration page that has
+all the dropdown lists for the module layout configuration. One such function is: 
+<font class="php_code">writeIntroPage</font>
+
+
+<a name="oscailt_ch4_6_5_1_">
+<h5> 4.6.5.1 Usage of indyObjectManager by index.php </h5>
+<i>Some of this was already covered in earlier sections above.</i> <br>
+When indyObjectManager is invoked from with <font class="php_file">index.php</font> which is primarily used for 
+site display rather than administrative tasks it does this if working with <strong>live</strong> objects which 
+is <strong>not</strong> the default mode.
+
+<font class="php_code">
+<pre>
+   $obj_man = new indyObjectManager( Parameters );
+   $result = $obj_man->getLiveObjectHTML( target_indyobject_id );
+</pre>
+</font>
+If it is working in the default mode using cached objects, then there is no need to invoke <b>indyObjectManager</b>
+because including the cascade of code cache files does what indyObjectManager is designed to do, which is to
+load up objects, and any objects contained by them, manage them and then retrieve the PHP-HTML code blocks
+which in turn are executed to display the pages.
+
+<a name="oscailt_ch4_6_5_2_">
+<h5> 4.6.5.2 Usage of indyObjectManager by admin.php </h5>
+When indyObjectManager is called via the <font class="php_file">admin.php</font> principally for site layout 
+functionality it calls it like this:
+<font class="php_code">
+<pre>
+   $obj_man = new indyObjectManager( Parameters );
+   $result = $obj_man->processRequest( site_options );
+</pre>
+</font>
+When an instance of indyObjectManager is created, it always creates an instance of the 
+<font class="oscailt_objs">indyObjectActionRequest</font> class. The main purpose of this class is to figure out
+from the multitude of options or parameters passed in the URL from within the site layout screens so as to 
+determine the next course of action. 
+<p>
+In the layout screens, the combination of URL options and form parameters are what allows the system to proceed
+to next step whether that is to preview a module, save it, or update the display because some option was ticked,
+or label filled in.
+
+<a name="oscailt_ch4_6_6_">
+<h4> 4.6.6 The IndyObjectActionRequest Class </h4>
+This class is used for creating the rather complicated request URLs for the administration layout pages and for
+decoding them too to determine what action is required and at the same time handling the permission checks or
+other related validation. It checks for whether notifications are required and implements the code to send them
+if necessary.
+<p>
+The (admin layout) actions covered by this class are:
+<strong> edit, view, xmlview, translate, list, create, delete, recache, import, export, site-recache, site-files
+</strong>
+<p>
+It is used in conjunction with the <font class="oscailt_objs">indyObjectSet</font> class in the 
+<font class="php_file">adminpage.inc</font> file. 
+
+<a name="oscailt_ch4_6_7_">
+<h4> 4.6.7 The Classes in the indydataclasses Directory </h4>
+These are the set of files that have the naming format: 
+<font class="php_file">indy<b><u>objectname</u></b>.inc</font> and are to be found in the directory:
+<font class="php_file">
+<pre>
+  html  
+    |
+    --- objects  
+             |   
+             --- indyobjects 
+                      |
+     	              ------ indydataclasses
+</pre>
+</font>
+Examples are:
+<font class="php_file">indynewswire</u>.inc</font> and <font class="php_file">indymenu.inc</font>. They have two
+main roles. The first is to act as a template for building the code cache for each instance of that particular
+class and the second reason is that since this code executes, it has to do something and that is, it contains
+functions for getting all the settings especially for things like section titles, descriptions, labels and other
+option values. They typically have variables and functions like the following but can and do include other 
+additional ones.
+<font class="php_code">
+<pre>
+     var display_options;
+     var runtime_requires;   -This is usually the PHP 'require' for the corresponding runtime object.
+                              Example: indyEventsObject requires eventsDisplay.inc
+
+     get_SomeAction_PHP()
+     getDefaultDisplayMode()
+     getFullPageSettingPHP()
+     getHTML()
+              -- calls ----&gt; getPHPBaseString()  -contains the code fragment:
+
+                                   $basic_php_tmpl_str = $req_php_str .
+                                                       ' $site_module = new [@[@0]@]('.$this->id().');
+                                                         $site_module->setFilters[@[@1]@];
+                                                         $object_display_settings = [@[@2]@];
+                                                         $site_module->setSiteSettings($object_display_settings);
+                                                        ';
+</pre>
+</font>
+For example we can have <font class="php_code">getPHPBaseString('eventsDisplay', param2, param3)</font> and within
+that function it creates the string <u>basic_php_tmpl_str</u> which later gets evaluated when the code cache
+fragment is executed. But not shown in the fragment above, the next step is to substitute the @ symbols for
+the input strings. Thus in the example it is the mechanism that will eventually create the text (that appears
+in the code cache file):
+<p>
+<font class="php_code">
+<pre>
+    $site_module = new eventsDisplay(52); 
+</pre>
+</font>
+The same type of substitution applies to the other lines.
+<p>
+Recall that all these classes are derived from <font class="oscailt_objs">indyBasicObject</font> or the
+<a href="#class_indySiteModuleObject">indySiteModuleObject</a> class above and alot of the implementation
+is actually coded in those classes.
+
+<a name="oscailt_ch4_6_8_">
+<h4>4.6.8 The ItemAction Class and Editor Actions</h4>
+One other important class but not in the class tree above because it is a root and unique class, is the 
+<font class="oscailt_objs">itemAction</font> class. It is used by <strong>managingDisplay</strong> for handling
+the editorial items on stories and comments such as hide, unhide, delete, clip, feature, downgrade and so forth.
+<br>
+<strong>Note:</strong> For <strong>edit</strong> there is a link directly to the publish page.
+<p>
+The <strong>itemAction</strong> class implements the displaying, security and process request handling for each
+of the story and attachment editorial actions like: clip, delete, hide, unhide, featurize, and so on.
+Some of its important functions are:
+</pre>
+<font class="oscailt_objs">
+<pre>
+    <b>itemAction</b>-&gt;getOptionalHTML()   -Used for returning the HTML to display the action button and link.
+	      -&gt;execute()           -Handles the request and calls executeOne for each action in multi actions
+                                     It also handles the send email notifications and writing to the editorial log.
+	      -&gt;executeOne()        -Implements the functionality for the action like hide, delete, upgrade etc.
+	      -&gt;getConfirmMessage() -Returns the HTML to draw the confirm box.
+</pre>
+</font>
+
+
+<p>
+<a name="oscailt_ch4_6_9_">
+<h4>4.6.9 Core Functionality Classes from Oscailt 2.x</h4>
+Oscailt 2 was basically the same system without the dynamic configuration and all of the associated classes.
+Instead it consisted of just a few core classes that dealt directly with stories and comments and anything
+else peripheral to them. These classes still exist but are now manipulated by this new outer and much larger
+layer. Some of these classes from Oscailt 2.x and all of which are standalone classes in their own right, are:
+<p>
+<font class="oscailt_objs">
+<!---
+    Attachment
+    Calendar
+    Comment
+    Story
+    StoryQuery
+    Region
+    Topic
+    Type ---!>
+</font>
+<table border=1 width="90%" cellspacing=2 cellpadding=2>
+<tr><th width=20%>Class</th><th>Overview </th></tr><tr>
+<TD class="oscailt_objs"> Attachment </td><td> Implements all loads, saves, deletes and any other actions
+related to attachments
+</td></tr><tr>
+<TD class="oscailt_objs"> Calendar   </td><td> Draws the calendar and generates the URLs for the Archives
+</td></tr><tr>
+<TD class="oscailt_objs"> Comment    </td><td> Handles key functions for comments like load, save, load comment
+attachments and editorial actions of comments like hide, unhide comments, delete, upgrade to story, move to story.
+</td></tr><tr>
+<TD class="oscailt_objs"> Story      </td><td> Similar to comments but also lock, unlock, stick, unstick, get and 
+set (story) topic, region and type. Get, load and delete comments, attachments etc.
+</td></tr><tr>
+<TD class="oscailt_objs"> StoryQuery </td><td> Handles all story related SQL queries and dynamically builds
+the query for a whole range of options. Used by newswire particularly.
+</td></tr><tr>
+<TD class="oscailt_objs"> Region     </td><td> Loads, saves, deletes regions and handles lists of them
+</td></tr><tr>
+<TD class="oscailt_objs"> Topic      </td><td> Loads, saves, deletes topics and handles lists of them
+</td></tr><tr>
+<TD class="oscailt_objs"> Type       </td><td> Loads, saves, deletes types and handles lists of them
+</td></tr>
+</table>
+<p>
+These are implemented in files of similar name largely in the <font class="dirpath">objects</font> directory.
+
+<a name="oscailt_ch4_7_">
+<h3> 4.7 Configuration within Oscailt </h3>
+There are several levels of configuration in Oscailt and these range from the configuration and layout of
+modules and pages to the setting of values for particular parameters and also to other data elements such as 
+lists of allowed file types for upload or a list of defined element types.
+<p>
+Clearly some data is more configurable than others and in the former case above, this merges in with the 
+functionality offered (i.e dynamic layout) to the other extreme where it is generally ill advisable to change 
+certain parameters unless there have been relatively major code changes to justify it. Somewhere in the middle 
+then are the main configurable parameters which are most accessible for change and these are held in two separate 
+files which happened to be named the almost same but reside in different directories. They are:
+<font class="php_file">html/objects/systemconfig.inc</font> and <font class="php_file">html/config/systemconfig.php</font>. The bulk of the parameters are in the first file. About half of these can be modified using the 
+administration <strong>Edit Configuration</strong> interface/screen. The rest have to be modified by editing the 
+files on the host Unix system.
+<p>
+In general those parameters which can be modified by the administration edit-configuration page can be read and written
+to the database. The rest are just hard coded.
+<p>
+Example of configuration data which almost will never change unless there are code changes that require it are
+the data in the directory <font class="php_dir">html/config/</font> in the files: <font class="php_file">
+attachments.php, datamodules.php, notification_levels.php</font> and <font class="php_file">permissions.php</font> 
+
+<a name="oscailt_ch4_7_1_">
+<h4> 4.7.1 Config Options and Files </h4>
+This information is presented in summary form below.
+<ul>
+	<li> Configuration through the Administration configuration page.
+	<li> Configuration through the Administration module and layout pages (already covered)
+	<li> Configuration through files. This can be further broken down into this list of files which
+	are reasonably likely to be changed and the second set which are unlikely to be changed.
+	<ul>
+		<li> Configuration parameters in <font class="php_file">html/objects/systemconfig.inc</font>
+		<li> Configuration parameters in <font class="php_file">html/config/systemconfig.php</font>
+		<p>
+		<li> Configuration parameters in <font class="php_file">html/config/attachments.php</font>
+		<li> Configuration parameters in <font class="php_file">html/config/markupconfig.php</font>
+		<li> Configuration parameters in <font class="php_file">html/config/permissions.php</font>
+        </ul>
+</ul>
+Some of the parameters in the two systemconfig.* files can be modified through the Administration configuration
+page. 
+
+<a name="oscailt_ch4_7_2_">
+<h4> 4.7.2 Changes to attachments.php </h4>
+Changes made here are likely to be very infrequent, but would typically be made to allow Oscailt to upload
+new filetypes. For example torrent files.
+
+<a name="oscailt_ch4_7_3_">
+<h4> 4.7.3 Changes to permissions.php </h4>
+Generally this file will only need to be modified if new functionality is added to the code and to a certain
+extent aren't really configuration changes but more in the category of code changes.
+
+
+<a name="oscailt_ch4_8_">
+<h3> 4.8 The Oscailt Database</h3>
+<a name="oscailt_ch4_8_1_">
+<h4> 4.8.1 Database Connects and Commits </h4>
+Every time a request is made for a page in Oscailt, in most cases it can potentially result in a database
+connect, but if database caching is enabled and the request is only for reading data, then if the data
+is in the cache, the request may then not need to make the connection.
+<p>
+When the request involves a update of some kind then a connection will be made since the cache is only for
+reads. For more information on the database cache, see section <a href="#oscailt_ch8_1_1_">8.1.1 Database Cache</a>
+below.
+<p>
+With MySQL when you open a database connection it defaults to using autocommit mode. This means that after
+each SQL statement that would require a commit, an automatic commit is carried out. If the SQL statement
+results in any kind of error then that statement is rolled back.
+<p>
+<a name="oscailt_ch4_8_2_">
+<h4> 4.8.2 List of Oscailt Database Tables </h4>
+The list of tables in Oscailt is shown below with the new tables defined for Oscailt 3.x highlighted in <b>bold</b>.
+The purpose of most of the tables is self evident and the relationship between stories, comments and tables is 
+relatively simple and shown in the diagram below. To view the column names and types in the tables, see the
+<font class="php_file">objects/installdatabase.inc</font>
+<p>
+<table width=95% cellpadding=4 cellspacing=2 border=2>
+<tr> <th width="25%"> Table Name </th><th> Table Description </th></tr>
+<tr> <td colspan=2"> <i>Defined in Oscailt 2.x </i> </td></tr>
+<tr> <td width="25%"> TOPICS </td><td> contains list of allowable story topics and their assigned ids.
+</td></tr>
+<tr> <td width="25%"> REGIONS </td> <td> same as TOPICS except for regions -i.e. counties.
+</td></tr>
+<tr> <td width="25%"> TYPES  </td><td> contains list of story types. (Feature, news, press release, opinion, event)
+</td></tr>
+<tr> <td width="25%"> LANGUAGES </td><td> same as for TYPES except languages, also stores language codes.
+</td></tr>
+<tr> <td width="25%"> STORIES </td><td> contains story contents and all other associated data.
+</td></tr>
+<tr> <td width="25%"> COMMENTS  </td><td> contains comment contents and all other associated data
+</td></tr>
+<tr> <td width="25%"> ATTACHMENTS </td><td> contains file paths to all image and audio files. Indexed by tables STORIES and COMMENTS
+</td></tr>
+<tr> <td width="25%"> EDITORS </td><td><strong> modified in 3.1</strong> for new columns: editor_lastlogin and editor_details
+</td></tr>
+<tr> <td width="25%"> CONFIGURATION </td><td> controls number of allowable images, audio files per story, per comment, site name, newswire query length etc
+</td></tr>
+
+<tr> <td colspan=2"> <i>Defined in Oscailt 3.0 </i> </td></tr>
+<tr> <td width="25%"> <strong>EDITOR_ROLES </strong> </td> <td> &nbsp; 
+</td></tr>
+<tr> <td width="25%"> <strong>ROLES </strong> </td> <td> &nbsp; 
+</td></tr>
+<tr> <td width="25%"> <strong>ROLE_PERMISSIONS </strong> </td> <td> &nbsp; 
+</td></tr>
+
+<tr> <td width="25%"> <strong>MASTER_DATA_OBJECTS </strong> </td><td> stores the master copy of created objects.
+</td></tr>
+<tr> <td width="25%"> <strong>DATA_OBJECTS </strong> </td><td> stores language specific versions of each created object.
+</td></tr>
+
+<tr> <td width="25%"> <strong>EDIT_LOCKS </strong> </td> <td> &nbsp; 
+</td></tr>
+<tr> <td width="25%"> <strong>BANNED_IPS</strong> </td> <td> <strong>modified in 3.1</strong> for new column: begin_ban
+</td></tr>
+<tr> <td colspan=2"> <i>Defined in Oscailt 3.1 </i> </td></tr>
+<tr> <td width="25%"> <strong>BANNED_AUTHORS </strong> </td> <td> &nbsp; 
+</td></tr>
+</table>
+<p>
+The use and structure of the tables is not complicated at all. The Editors, Roles and Permission tables obviously
+form an interrelated set and this can be worked out by reading about 
+<a href="#oscailt_ch9_introduction">Editor Permissions and Roles </a> further on in this document.
+</p>
+<p>The MASTER_DATA_OBJECTS and DATA_OBJECTS structure is also very simple, but on their own they won't make much
+sense. To understand the objects more and how they are stored, it is best to read the section:
+<a href="#oscailt_ch4_1_2_">Storage of the Elements, Modules and Layout Objects</a>.
+
+</p>
+<p>
+<img src="StoryCommentAttachments.jpg" align="right" alt="Fig 7: Relationship between stories, comments and attachments tables" hspace=10>
+</p>
+<p> For an understanding of the TOPICS, REGIONS, TYPES, STORIES, COMMENTS and ATTACHMENTS tables, the original
+design notes for Oscailt 2.x will be more than adequate and besides their structure is very clear. Only the
+ATTACHMENTS table will need some closer examination to see how it relates to the STORIES and COMMENTS tables
+and this is indicated in the diagram to the right.
+<i>COMMENTS are obviously directly related to STORIES</i>.
+<p>
+
+<br clear="all">
+<p>
+<a name="oscailt_ch4_9_">
+<h3> 4.9 Edit Locks </h3>
+These were introduced to deal with the case where multiple users or editors were logged in at the same time
+and attempting to work on the same story, feature, comment or module. If there was no mechanism to detect
+this, then one editor could easily overwrite another's changes. The solution was to create the EDIT_LOCKS
+table and whenever an editor is modifying a given object (story, comment, module), Oscailt writes an entry
+to this table specifying the editor, the object and the time.
+<p>
+Likewise before any object can be modified by an editor, Oscailt checks to see if the object is already
+locked. The locks are cleared when the editor saves the object or specifically releases the lock. This
+option to release the lock and cancel any changes is clearly visible in the publish form when it is in use
+by an editor in edit mode.
+<p>
+The main file involved in this functionality is the <font class="php_file"> html/objects/editlock.inc </font> 
+which implements the <font class="oscailt_objs">EditLock</font> class. 
+
+
+<a name="oscailt_ch4_10_">
+<h3> 4.10. Controlling Use of HTML and Other Tags in Input  </h3>
+As with all HTML forms on most websites, it is necessary to restrict the use of the full set of HTML tags
+as these would otherwise present both huge security holes and a very real possibility of upsetting the 
+HTML tags for the display of the site pages by such things as unclosed tags or broken HTML.
+<p>
+Oscailt does this by validating the input (in the publish form), by searching for any tags that belong
+in a pre-configured list of tags. These are defined in <font class="php_file"> html/config/markupconfig.php</font> 
+and making use of the set of functions in <font class="php_file"> html/objects/contentcleaning.inc</font> 
+<p>
+It is also possible to allow a limited set of tags to be used by users for publishing and these tend to be tags
+for line breaks, paragraphs, bold, underline, italics and the small tag directive for font size. If these
+are not closed they are easier to spot and fix and will not break the HTML table tags used for controlling
+the site display layout.
+<p>
+In Oscailt 3.1, embedded video has been implemented and the main challenge was to get around the problem of
+allowing users to enter the <strong>object, script</strong> and <strong>embed</strong> tags which are needed
+for the embedding. The solution is for the users to enter just the video identifier and let Oscailt generate
+the associated HTML code.
+
+
+<a name="oscailt_ch4_11_">
+<h3> 4.11 Use of JavaScript in Oscailt </h3>
+In general the use of JavaScript in Oscailt has been kept to a minimum because it can be problematic since it can
+be enabled or disabled by the user in the browser and is affected by security settings so that the user themselves
+may not be fully unaware of what is happening.
+<p>
+Nevertheless, JavaScript is used in a few places as it is unavoidable and happens to be the best choice in those
+cases. The areas where it is used are:
+<ul>
+	<li> Publish Form
+	<ul>
+	<li> Category selection for story type, topic, region and language.
+	<li> Event date selection.
+	<li> Optional validation button when uploading files. -<i>Added in 3.1</i>
+	<li> (Administration mode) Timer for display of story editor lock.
+	</ul>
+	<li> Newswire Filter Settings (<i>To be confirmed</i>)
+	<li> (Administration mode) Article display for handling checkboxes for actions.
+	<li> (Administration mode) Object layout pages for drop down lists handling.
+	<li> (Administration) View Logs for Reported Posts for hide / show of email text body -<i>Added in 3.1</i>
+
+</ul>
+
+<a name="oscailt_ch5_introduction">
+<h2> 5. The Admin Functionality Explained </h2>
+This section describes how the administration section works and the main php files and objects involved. It just
+covers the administration pages themselves and not the administration functionality that can be carried out
+on stories and comments. Nor does it cover some of the other specific administration type functionality accessible
+from the administration page, like statistics, edit editors, bulk deletes, site logs etc.
+<!-- as these are covered in subsequent sections. -->
+<p>
+To carry out any administrative task, clearly an editor has to be logged into Oscailt, and two of the most
+important support classes for this are
+<font class="oscailt_objs">Editor</font> which contains editor details and includes permissions information
+and the class <font class="oscailt_objs">EditorSession</font> used for handling the editor session and
+enabling the code to determine if the user is logged in.
+<p>
+For reference the two images below show the main administration page and the page for accessing the site and 
+module layout configuration.
+<p align="center">
+<a name="oscailt_design_fig8">
+	<table width="100%" border=0>
+<tr align="center"><td>
+<a href="admin_main.jpg"><img src="admin_main.jpg" align="middle" alt="Fig8a: Main Admin Page" height="600" width="400"></a>
+</td><td>
+<a href="admin_site.jpg"><img src="admin_site.jpg" align="middle" alt="Fig8b: Site Section Admin Page" height="650" width="400"></a>
+</td></tr>
+<tr align="center"><th> Admin 1. Main Admin Screen </th> <th> Admin 2. Site Layout Admin Page </th>
+</tr></table>
+<p>
+<p>
+The most important files for the generation and display of these administration pages are:
+<font class="php_file">
+<pre>
+    -- html     Files: admin.php                  editlanguages.php    --| All of these files are
+	|              bulkdelete.php             editmonitor.php        | linked in the first admin
+	|              clearcache.php             editredirects.php      | screen image shown above.
+	|              editbannedips.php          editregions.php        |
+	|              editconfiguration.php      editroles.php          |
+	|              editedtiors.php            edittopics.php         |
+	|              editexport.php             edittypes.php          |
+	|              editimport.php             stats.php              |
+	|                                         viewsitelog.php      --|
+	|
+	|
+        |____ objects    Files: adminpage.inc
+        |         |             utilities.inc
+	|         |
+	|         |____ indyobjects   Files: indyitemset.inc
+	|                                    indyobject.inc
+	|
+	|                  
+        |____ xmldata    Files: universal_config_options.xml
+                 |              site_management_options.xml
+                 |
+		 |_____ indydatatypes  Files: archive.xml article.xml bar.xml basic.xml box.xml
+		                              categorylist.xml ......   search.xml site.xml 
+					      These are used for the module configuration and layout.
+  
+</pre>
+</font>
+The main logic or functionality for the admin page (implemented and called through 
+<font class="php_file">admin.php</font> and <font class="php_file">adminpage.inc</font>) is to determine and 
+display:
+<font class="php_code">
+<ol>
+	<li> Admin login screen
+	<li> Main admin page for configuration &nbsp; &nbsp; &nbsp; -i.e <i>image admin 1. above </i>
+	<li> Admin page for site construction and layout &nbsp; &nbsp; -i.e <i>image admin 2. above </i>
+	<ul><li> Sub pages displaying element and module lists in site layout &nbsp; &nbsp; -i.e <i>image admin 3. below </i>
+	</ul>
+	<li> Admin page for editing style sheets.
+</ol>
+</font>
+The code for 1 and 4 above, are largely trivial, while the code for 2 is more or less about reading XML files and
+creating and displaying the menus. The code for 3 is the most complex and calls upon many of the management
+classes of Oscailt and this is the main part of the explanation below.
+<p>
+When any of the basic admin sub-functionality like <strong>configuration, editing URLs, editors, roles, regions, 
+types, languages, IP monitoring, blocking IPs, viewing logs, statistics</strong> and so forth are
+required then the php files in the html/ directory listed above are called. See the section on
+<a href="#oscailt_ch5_3_">5.3 Basic Admin Files</a> below for more details about this.
+
+<p>
+<a name="oscailt_ch5_1_">
+<h3> 5.1 Admin.php Code Execution Sequence </h3>
+This section attempts to explain how the above functionality works, (especially for 2 and 3), by detailing
+the main execution sequence when the admin.php script is called and showing how the displays are generated.
+<p>
+The main execution sequence to display any of the admin pages is:
+<font class="php_code"> 
+<pre>
+     admin.php --&gt; 1. Create a AdminPageObject   ( by calling <b>objects/adminpage.inc</b> )
+                   2. If logged in then call <b>processRequest</b>  ( in AdminPageObject )
+                   3. If not logged in, display the login page.  |
+                                                                 |
+     -------------------------------------------------------------
+     |
+    \|/
+     2. (continuation from above)
+     processRequest --&gt; 1. Call 'load'<sup>1</sup> to read a) XML settings for main admin page. (universal_config_options.xml)
+                                                b) XML settings for site section admin page. (site_management_options.xml)
+
+                        2. Determine if displaying main admin page. 
+			   If yes then call 'writeAdminPage'  --part of AdminPageOject -i.e. draw image 1 above.
+
+                        3. Determine if displaying site section admin page.
+                           If yes then create a <b>'indyObjectManager'</b> object passing <b>xmldata/indydatatypes</b> directory
+                           call <b>processRequest</b> of the 'indyObjectManager' object created in step 3.
+				 a) reads the request URL to determine the action 
+				 b) create a <b>indyObjectSet</b> to be used for loading all the objects
+				 c) if no action is specified then the request is for the main layout page.
+				    if no action then step d) else step e)
+				 THEN
+				 d) call indyObjectManager-&gt;<b>writeIntroPage</b> <sup>2</sup>
+					     This calls
+					     i)  indyObjectSet-&gt;<b>load</b> to load all datatypes from
+					         <b>xmldata/indydatatypes</b> (archive.xml, article.xml ... site.xml)
+					     ii) displays menu options for element, modules and layouts
+
+				 ELSE
+				 e) Handle admin layout module request ....
+
+                        4. Determine if displaying Style Sheet Admin page(s). 
+                           If yes then call 'writeStyleSheetSection'  --part of AdminPageOject
+</pre>
+</font>
+<b>Note 1</b>: In the <b>load</b> to read the XML settings, it actually creates an 
+<font class="oscailt_objs">IndyItemSet</font> object and calls the 
+<b>load</b> for that object because that internally is implemented to look for any language translations
+versions of the XML files that it is instructed to load.
+<p>
+<b>Note 2</b>: The function <font class="php_code">writeIntroPage</font> in <font class="oscailt_objs">indyObjectManager</font> has to first load all the data types from directory 
+<b>xmldata/indydatatypes</b> and an <b>indyDataTypeSet</b> is created to hold these. Then all these types
+are basically validated against the global array variable <font class="php_code"> $legalDataTypes</font> which 
+is initialized in <font class="php_code">config/datamodules.php</font> This array maps the allowed types into
+a number of groups which are: <i>site, element, layout and module</i>. It is the last 3 in this list then
+that the associated titles, descriptions, links and graphics etc are read from the data type XML and
+displayed as a series of menus in the administration site building main page.
+<p>
+For some clarification of the code details here, this is basically what it inside <b>writeIntroPage()</b>
+in object <font class="php_code">indyObjectManager</font> via the call to 
+<font class="php_code">processRequest</font> from <font class="php_file"> adminpage.inc</font>
+<font class="php_code"> 
+<pre>
+     writeIntroPage --&gt; 1. Call indyObjectSet-&gt;<b>load</b> - to load all data types via
+				a) Call function <b>_loadTypeSet</b> in indyObjectSet
+				     -which in turn calls:
+				     i)  Create a new <b>indyDataTypeSet</b> object.
+				     ii) Call indyDataTypeSet-&gt;<b>load</b> 
+
+				b) Call function <b>_loadObjectStubsFromDb</b> in indyObjectSet
+			2. Create a new indyDataTypeSet object 
+			3. Call indyDataTypeSet-&gt;<b>load</b> and indyDataTypeSet-&gt;<b>loadAllTypeDetails</b> 
+			4. Generate some basic html navigation and headers for admin page.
+			5. Call <b>writeSiteObjectsMenuSection</b> -writes bulk of screen in 2nd admin image above
+				a) Validate all the datatypes against $legalDataTypes
+				b) write admin page menu header.
+				c) write menu sections for all type that are <b>elements</b>
+				d) write menu sections for all type that are <b>module</b>
+				e) write menu sections for all type that are <b>layout</b>
+				f) write admin page menu footer.
+
+</pre>
+</font>
+<a name="oscailt_ch5_1_1_">
+<h4> 5.1.1 Main Classes Used </h4>
+This is not necessarily a fully comprehensive list but the main objects used for admin functionality are:
+<br> <br>
+<table border=1 width="80%"><tr>
+<td> <b>AdminPageObject</b> </td><td>   -derived from indyObject (found in objects/indyobjects/indyobject.inc )
+</td></tr><tr>
+<td> <b>indyItemSet </b>   </td><td> -implemented in objects/indyobjects/indyitemset.inc and derived from indyObject
+</td></tr><tr>
+<td> <b>indyObjectSet </b>  </td><td>  -implemented in objects/indyobjects/indyobjectset.inc and extends class indyObject
+<br> This manages the datatypes taking care of loading, saving, setting and getting data.
+</td></tr><tr>
+<td valign="top"> <b>indyObjectManager </b> </td><td>   -implemented in objects/indyobjects/indyobjectmanager.inc and derived from indyObject
+	<p><u>Users of this object:</u>
+	<ul><li> <b>adminpage.inc </b> -Covered above.</li>
+	<li> <b>editeditors.php </b> -Deals with just this functionality.</li>
+	<li> <b>editredirects.php </b> 
+	<li> <b>index.php </b> -almost all requests go through index.php and it is used to manage the objects that
+	make up the pages that are displayed when in live (objects) mode.
+	<li> <b>objects/adminpage.inc </b> -dealt with above.
+</ul>
+</td></tr>
+<td> <b>indyObjectActionRequest </b> </td><td>   -implemented in objects/indyobjects/indyobjectactionrequest.inc and derived from indyObject
+<br> This object seems to deal with managing permissions and locks associated with 'actions'
+</td></tr>
+<td> <b>indyDataTypeSet </b> </td><td>   -implemented in objects/indyobjects/indydatatype.inc and derived from indyObject
+</td></tr>
+</table>
+<a name="oscailt_ch5_2_">
+<h3> 5.2 Admin XML Files </h3>
+The two main XML files <font class="php_code"> universal_config_options.xml </font> and
+<font class="php_code"> site_management_options.xml </font> contain the titles, description, links, pointers
+to graphics and icons and classification or type of each of the elements displayed in each of the two main
+administration pages. This means that these pages can be easily changed and new functionality added to the 
+administration. 
+<p>
+For example in the main admin page, the first section is called: Basic Configuration and it contains 3 items
+which are: Edit Configuration, Edit Friendly URLs and Edit Default Style Sheets.
+<p>
+If we look in <font class="php_code"> universal_config_options.xml </font> we can see that the title and the 3
+elements belonging to it are controlled or rather specified by these XML sections labelled:
+<font class="php_code"> 
+<pre>
+&lt;item name="main_title" type="string"&gt;
+    &lt;title&gt;Basic Configuration&lt;title&gt;
+&lt;/item&gt;
+
+&lt;item name="editconfiguration" type="mainaction"&gt;
+....
+&lt;/item&gt;
+&lt;item name="editredirects" type="mainaction"&gt;
+....
+&lt;/item&gt;
+&lt;item name="editstylesheets" type="mainaction"&gt;
+....
+&lt;/item&gt;
+</pre>
+</font>
+You will notice that while this is quite flexible it has not be made fully so, because in the code, it is still
+hardcoded to explicitly look for the <b>main_title</b> item and then the set of <b>main_action</b>s. It would
+probably have been more consistent to define these in the XML file as sub-sections of the <b>main_title</b> item.
+<p>
+This is the case with all the other items and components on the administration pages and it might be something
+that could be more fully implemented in the future. Any changes though would need to keep in mind any possible
+impacts that might occur elsewhere in the code and the value of it. On the one hand it would make those sections
+more understandable in the XML files because at the moment you need to both be familiar with the PHP code and the
+XML to understand both. Putting more structure into the XML definition could risk making the code even harder
+to understand especially if documentation and comments are not supplied.
+<p>
+There is no need to explain the rest of this XML file or the other one because the same strategy or design is
+used throughout and it should now be easy to follow to understand.
+<a name="oscailt_ch5_2_1_">
+<h4> 5.2.1 More about the XML Files </h4>
+It will be noticed that all the files in the directory: <b>xmldata/indydatatypes</b> which are:
+<p align="center">
+	<table border=0 width="70%"><tr>
+	<td class="php_file"> archive.xml <br> article.xml <br> bar.xml <br> basic.xml <br> box.xml <br> categorylist.xml <br> citylist.xml 
+	<td class="php_file"> codebox.xml <br> comments.xml <br> contact.xml <br> document.xml <br> events.xml <br> feature.xml <br> feedexport.xml 
+	<td class="php_file"> feedimport.xml <br> filterbox.xml <br> gallery.xml <br> headlinebox.xml <br> link.xml <br> list.xml <br> menu.xml 
+	<td class="php_file"> newswire.xml <br> page.xml
+	<br> picturebox.xml <br> preferences.xml <br> publish.xml <br> search.xml <br> site.xml
+</tr></table>
+</p>
+match (and must match) the set of files in directory: <b>objects/indyobjects/indydataclasses</b> because they 
+implement or define the functionality of those objects or classes. [<i>These words are used interchangeably here</i>]
+These indydataclasses files are called: <font class="php_code">indyarchive.php .... to .... indysite.php </font>
+<p>
+
+
+<a name="oscailt_ch5_3_">
+<h3> 5.3 Basic Admin Files </h3>
+This section summarizes some of the functionality contained in the PHP files that implement the more
+basic and older parts of the administration of Oscailt. All these files are in the root directory:
+<font class="php_dir">html/ </font>. They are grouped by their relatedness to each other. In most cases these
+files use classes of a similar name but where the names are a bit different, they are mentioned.
+<p>
+<table border=1 width="95%"><tr>
+<td class="php_file"> bulkdelete.php</td><td> -implements the bulk delete of old hidden stories and comments. Shows
+some basic hidden story and comment statistics.	</td> 
+</tr><tr>
+<td class="php_file"> clearcache.php</td><td> -this can clear any one or all of the different caches. Contains
+a very simple screen. </td> 
+</tr><tr>
+<td colspan=2> <br>  </td>
+</tr><tr>
+<td class="php_file"> editbannedauthors.php</td><td> -implements the ban names screen. Works with class <font class="oscailt_objs">BannedAuthor</font> and <font class="oscailt_objs">BannedAuthorList</font>. <i>This was introduced in
+Oscailt 3.1 </i></td> 
+</tr><tr>
+<td class="php_file"> editbannedips.php</td><td> -implements the ban IP screen. Works with class <font class="oscailt_objs">BannedIP</font> and <font class="oscailt_objs">BannedIPList</font>. </td> 
+</tr><tr>
+<td class="php_file"> editmonitor.php</td><td> -implements the IP monitor which has a very simple screen. It uses
+the classes <font class="oscailt_objs">PublishMonitor</font> and <font class="oscailt_objs">PublishMonitorEntry</font>. </td> 
+</tr><tr>
+<td class="php_file"> editredirects.php</td><td> -implements the screen for adding and editing Friendly URLs. It has some additional sub-screens. Use classes <font class="oscailt_objs">RedirectList</font>. </td> 
+</tr><tr>
+<td class="php_file"> editconfiguration.php</td><td> -this implements the basic site configuration covering site name, number of allowed uploads and images sizes etc. It is a fairly simple screen and needs to read and write to the Db.</td> 
+</tr><tr>
+<td colspan=2> <br>  </td>
+</tr><tr>
+<td class="php_file"> editeditors.php</td><td> -implements the creation of new editors or users. Also includes 
+	basic editing of information like name, password and email address.</td> 
+</tr><tr>
+<td class="php_file"> editroles.php</td><td> -implements the screen for adding and modifying editor roles. This is relatively complex. </td>
+</tr><tr>
+<td colspan=2> <br>  </td>
+</tr><tr>
+<td class="php_file"> editlanguages.php</td><td> -implements the screen for adding new languages to the system.</td> 
+</tr><tr>
+<td class="php_file"> editregions.php</td><td> -implements the screen for adding new regions like counties. It includes the code for the add and delete </td>
+</tr><tr>
+<td class="php_file"> edittopics.php</td><td> -implements the screen for adding new topics -i.e. subject categories for stories. This is functionality very similar for region and types. </td>
+</tr><tr>
+<td class="php_file"> edittypes.php</td><td> -implements the screen for adding new types. This would be rarely used as the system already comes with news, press release, feature, opinion analysis and event. </td>
+</tr><tr>
+<td colspan=2> <br>  </td>
+</tr><tr>
+<td class="php_file"> editimport.php</td><td> -implements the screen for importing objects. This will generally be used during site creation, and rarely otherwise.</td>
+</tr><tr>
+<td class="php_file"> editexport.php</td><td> -implements the screen for exporting objects for sharing with other sites or for other reasons. It is not likely to be used very often.</td>
+</tr><tr>
+<td colspan=2> <br>  </td>
+</tr><tr>
+<td class="php_file"> editorstatus.php</td><td> -implements the screen for displaying whether editors are logged in and shows any posted messages. It also allows editors to post messages for other editors to see in real time.
+<i>This was introduced in Oscailt 3.1</i></td>
+</tr><tr>
+<td colspan=2> <br>  </td>
+</tr><tr>
+<td class="php_file"> stats.php</td><td> -implements the screen for basic statistics on stories and comments. It simply executes a bunch of SQL statements and displays the results. Works with class 
+<font class="oscailt_objs">Statistics</font>. The statistics reported has been expanded for the next release.</td> 
+</tr><tr>
+<td class="php_file"> viewsitelog.php</td><td> -implements a simple screen for viewing a page at a time of any one 
+of the three system log files: sitelog.txt, actionlog.txt and securitylog.txt This has been greatly expanded
+for the next release. See section on Logging below.</td>
+
+</tr></table>
+
+<a name="oscailt_ch5_3_1_">
+<h4> 5.3.1 Miscellaneous Files </h4>
+The next table lists a number of miscellaneous files in the root directory: <font class="php_dir">html/ </font> 
+that don't really belong in any category.
+<p>
+<table border=1 width="95%"><tr>
+<td class="php_file"> adminfooter.inc</td><td> -included by all the administration (php) files for administration screens. See the subsection below on this.</td> 
+</tr><tr>
+<td class="php_file"> footer.inc</td><td> -included by index.php and adminfooter.inc. It simply contains the closing
+tags for BODY and HTML tags. </td> 
+</tr><tr>
+<td class="php_file"> footerprint.inc </td><td> -writes the URL of the print page and the end of the page, closes HTML tags and disconnects from the database. </td> 
+</tr><tr>
+<td colspan=2> <br>  </td>
+</tr><tr>
+<td class="php_file"> header.inc</td><td> -contains the contents of the HEAD section for the HTML page returned. Used by <font class="php_file">index.php</font>. It fills in the meta tags, references style sheets, sets character set 
+and the page title.</td> 
+</tr><tr>
+<td class="php_file"> headerprint.inc</td><td> -basically same as above but references the style sheets used for printing. </td> 
+</tr><tr>
+<td colspan=2> <br>  </td>
+</tr><tr>
+<td class="php_file"> oscailt_init.inc</td><td> -Includes most of the .inc files in the objects/ directory and initializes the main global variables and creates object instances (for basic things like redirects, topics, regions, types, language) and reads and sets some of the HTTP request variables. </td> 
+</tr><tr>
+<td class="php_file"> oscailt_destroy.inc</td><td> -Disconnects from the database.</td> 
+</tr><tr>
+<td colspan=2> <br>  </td>
+</tr><tr>
+<td class="php_file"> rescueheader.inc</td><td> -Contains a basic html HEAD section used by rescue page.</td>
+</tr><tr>
+<td class="php_file"> rescuepage.inc</td><td> -This gets called by most of the administration pages, and draws the
+outer table in which admin layout sits. It echos the buffered page contents in the middle of this table. This page is called also when no layout page has been found for a module. </td>
+</tr></table>
+
+<a name="oscailt_ch5_3_1_1_">
+<h5> 5.3.1.1 The AdminFooter.inc File </h5>
+All the basic Admin files listed above included the <font class="php_file">adminfooter.inc</font> file and as
+described in <a href="#oscailt_ch3_3_1_">3.3.1 Output Buffering and Oscailt</a> this file also makes use of
+buffering. Since almost none of the admin files are cached, then the 'rescue' pages are used. The code 
+execution is of the form:
+<font class="php_code">
+<pre>
+     ob_start();
+     Do admin stuff + functionality
+
+     (Inside adminfooter.inc)
+     $PAGE_CONTENTS = ob_get_contents();
+     ob_end_clean();
+     .
+     .
+     require("rescueheader.inc");
+     require("rescuepage.inc");       -This file draws a table and echo's $PAGE_CONTENTS in the middle of it.
+     require("oscailt_destroy.inc");  -Close any db connections.
+     require("footer.inc");           -Close BODY AND HTML tags.
+
+</pre>
+</font>
+
+
+<a name="oscailt_ch5_4_">
+<h3> 5.4 Edit Topics, Regions, Types and Languages </h3>
+The administrative functionality of all these are very similar. The files for implementing the screens for these
+are already listed above and the tables that they store their data in are:
+<font class="php_file">TOPICS, REGIONS, TYPES</font> and <font class="php_file">LANGUAGES</font>. The IDs in
+the first 3 tables are stored in the STORIES table and this is how a story is categorised. This means then
+the IDs should never been modified once stories are in the database and to prevent this happening separate
+permissions can be assigned to editors to allow for the editing or addition of these attributes.
+<p>
+Note: In a later version of Oscailt the Topics, Regions and Types categories may be succeeded by tags.
+
+
+<a name="oscailt_ch5_5_">
+<h3> 5.5 The IP Monitor </h3>
+The IP monitor is a relatively simple display available as part of the administration toolkit. It simply displays
+the IP number, story or comment author and URL, time posted along with status of whether the IP is banned or not. 
+It is possible because the incoming request contains the IP in the 
+<font class="php_code"> $_SERVER['remote_addr'] </font>
+<p>
+It is implemented largely through the two files:
+<font class="php_file"> html/editmonitor.php </font> which mainly handles the display and
+<font class="php_file"> html/objects/publishmonitor.php </font> which handles creating and saving the entries.
+There is a maximum of around 50 entries or so saved and these are stored in the cache in the file
+<font class="php_file"> html/cache/publishmonitorcache.inc </font>. This is 
+in fact a PHP file. It simply contains PHP code that creates an instance of the 
+<font class="oscailt_objs">PublicMonitorEntry</font> class. All of these are then stored as an array of these
+objects in the <font class="oscailt_objs">PublicMonitor</font> class which is then handled by the display.
+Since there is not much data, it is fairly easy to follow the code.
+<p>
+The other main but small part of it is some code in the publish module (<font class="php_file">publishdisplay.inc</font>) which contains code to write the entries for a story or comment whenever the monitor is active.
+<p>
+Note: <i>In Oscailt 3.1, code has been added to specify a duration to keep the monitor turned on, after which
+period it will shut off automatically.</i>
+
+<a name="oscailt_ch5_6_">
+<h3> 5.6 IP Banning </h3>
+There are two forms of IP banning which are a) banned reading the site and b) banned from publishing. The former
+is likely to be much rarer than the latter. 
+<p>
+In the first method, the IPs are held in a string variable and as each request is received, the incoming IP
+address is matched for any of the entries in the list and if they match they are redirected to another
+(preconfigured) site. This <strong> redirect banned url</strong> is configurable from the administration system. 
+<p>
+In the second method, IP banning works by adding an IP to be banned to the database. Whenever a request 
+for a publish (of a story or comment) is received the list of 
+banned IPs is automatically loaded into an array (of banned objects) and the IP address is matched 
+against this list and used to determine whether to disallow that user. 
+<p>
+For every other publish operation, the banned list is scanned to remove any entries that have now expired.
+<p>
+It turns out that most of the functionality is for dealing with the display of the IP banned list from the 
+administration screen and enabling editors to add, edit and remove IP bans. However this code is relatively 
+straight forward and it can be found in the two files: <font class="php_file">editbannedips.php, bannedip.inc</font>
+and <font class="php_file">adminutilities.php</font>.
+The table for storing banned IP information is: <strong>BANNED_IPS</strong>.
+
+
+<a name="oscailt_ch5_7_">
+<h3> 5.7 Editor Status and Messaging </h3>
+This functionality is accessible from the administration screen and allows users (editors) to see what other 
+editors are logged in. It also allow editors to send a broadcast message (up to 80 chars) that can be seen
+by any other logged in editor. It is viewable from this same screen (only). The functionality for the messaging
+is file based and very similar to the way IP monitoring works. The idea was to avoid database writes.
+<p>
+This function will appear in the next release of Oscailt (<i>3.1</i>).
+<p>
+Most of the functionality is implemented within the files: <font class="php_file">editorstatus.php</font> and 
+<font class="php_file">publishstate.inc</font>. There were also changes made to 
+<font class="php_file">editorsession.inc</font> at the point where users login and logout so that entries could
+be written to the <font class="php_file">cache/publishstatecache.inc</font> file to track these. 
+<p>
+Further functionality could be added at the point where editors carry out editorial actions like hide or edit.
+These would have to be written to the file above and then could be reported, although the value of this is
+questionable so it is currently not done. If it is, then that part could be made configurable.
+<p>
+For logged in editors, the <font class="php_file">index.php</font> makes a call to 
+<font class="php_file">oscailt_msg.inc</font> which scans the contents of the Oscailt message cache to determine
+if there is an unread message by that editor and if there is generates a notification message at the top of 
+the page. However, the capability of this functionality is limited by the cache size which is configurable.
+<p>
+For an Oscailt installation with many users, the limitations of this messaging system would become clear.
+
+<a name="oscailt_ch6_introduction">
+<h2> 6. Language Translation </h2>
+This section is placed here because if language translations are required then the XML files just discussed in
+the previous section are most relevant.
+<p>
+With Oscailt 3.x a fairly big effort has been made to make it easy to translate most of the text strings
+visible on the public site and this has been done by allowing much of the text to be configurable through
+XML files. This is generally the standard way of doing these things now.
+<a name="oscailt_ch6_1_">
+<h3> 6.1 Defining Languages in Oscailt </h3>
+Languages in Oscailt are defined by adding entries with the <strong>Edit Languages</strong> administration page and
+these get stored in the <strong>language</strong> table which stores the language id, name and code.
+<p>
+When a page is requested Oscailt tries to determine the language to see if the variable <strong>userlanguage</strong>
+is set in any of the $_GET, $_POST or $_REQUEST variables. If not it will try and use the value, if set, in the
+http header via $_SERVER['HTTP_ACCEPT_LANGUAGE']. This means that you can override your browser language setting
+if say it was set to Spanish, by adding 'userlanguage=en' to the request URL to request an English version of a
+page.
+<p>
+In general Oscailt will then use the language two character code to look for language specific files in the
+object cache to serve back the appropriate language version page. These do require that they have been generated
+in the first place in the Oscailt administration and layout interface. For more about this, see the sections
+that follow.
+<p>
+<a name="oscailt_ch6_2_">
+<h3> 6.2 Master Pages, Language Specific Pages: How to Translate Oscailt Public Pages</h3>
+The Oscailt public pages can be translated by having language specific instances of each module. These can be
+created from the Oscailt administration layout pages. It is first necessary to have added the language to
+Oscailt via the <strong>Edit Languages</strong> administration page. These instances are then stored in the
+database in the DATA_OBJECTS table. So for example if you had an English, French and Spanish version of (module)
+object 54, the entries in DATA OBJECTS for the OBJECT_ID and LANGUAGE_CODE would be:
+<pre>
+     OBJECT_ID   LANGUAGE_CODE
+     54          en
+     54          fr
+     54          es
+</pre>
+<p>
+As part of this mechanism to support languages, Oscailt has introduced for each object type, the concept of a 
+<strong>master</strong> page and then individual language specific pages. The master page can also serve as a type 
+of reference and there is some overlap between this functionality and the language specific functionality.
+Internally for every instance of an object created a single entry is made in the MASTER_DATA_OBJECTS table and
+then as described above, then for each slave or language specific version of that object there are entries in
+the DATA_OBJECTS table. So if there is only one language in use, then the number of rows in each table will be
+the same.
+<p>
+There may be some confusion between language versions of the modules themselves and language versions of the
+administration screens for configuring each of the modules. For the latter see the section
+<a href="#oscailt_ch6_3_1_">6.3.1 Language Versions of Administration Layout Pages</a> below
+<p>
+<strong>Note:</strong> There may still be a few strings in the modules that are hard coded in English and later 
+versions of Oscailt will have to deal with these.
+<p>
+If you plan on using character sets other than the <strong>default</strong> character set <strong>iso-8859-1</strong>
+then see the section on <a href="#oscailt_ch6_4_">6.4 General Language Support Background </a> and 
+<a href="#oscailt_ch6_5_">6.5 Unicode Support </a> below.
+<p>
+<a name="oscailt_ch6_2_1_">
+<h4> 6.2.1 Default Language </h4>
+If you want to make the default language anything other than English, then the existing XML files in
+<font class="php_file">xmldata/indydatatypes/*.xml</font> could be translated directly.
+
+<a name="oscailt_ch6_3_">
+<h3> 6.3 How to Translate Oscailt Adminstration Pages</h3>
+<p>
+The administration pages do not have full language support and currently only the main administration page, the
+individual layout pages and the administration options on the public site for actions like hide, edit, delete 
+etc can be translated. 
+
+<p>
+The individual administration screen/pages cannot be translated as the text strings are currently hard coded.
+e.g. configuration, statistics, clear cache etc.
+<p>
+The main files where text exist that needs to be translated are as follows:
+<ul>
+	<li> <font class="php_file">xmldata/itemcache/*.inc </font> -contains 'actionData' strings that are only seen by editors.
+	<li> <font class="php_file">xmldata/universal_config_options.xml</font> 
+	<li> <font class="php_file">xmldata/site_management_options.xml</font> 
+	<li> <font class="php_file">xmldata/editoroptions.xml</font> <i>Apparently not used</i>
+	<p>
+	<li> <font class="php_file">xmldata/indydatatypes/*.xml</font> -Module layout pages.
+</ul>
+<p> This covers some of the following areas:
+<ul>
+	<li> Administration Pages -includes menus, titles, headings, links etc
+	<li> Headings, action text etc in public side of site.
+	<li> Administration layout pages.
+</ul>
+When changing these files, rename the translated file to contain the two letter language code. So translating
+<font class="php_file">xmldata/universal_config_options.xml</font> into French, then you should have a file name: 
+<font class="php_file">xmldata/universal_config_options_fr.xml</font> 
+And as before remember to modify the language code in the first line or two to the correct value. For example:
+<strong>
+<pre>
+   &lt;indyItemSet language="fr" name="universal_config_options"&gt;
+</pre>
+</strong>
+Likewise for the action pages <font class="php_file">xmldata/itemcache/hide.inc</font> in the French version would
+be <font class="php_file">xmldata/itemcache/hide_fr.inc</font>.
+<a name="oscailt_ch6_3_1_">
+<h4> 6.3.1 Language Versions of Administration Layout Pages</h4>
+The main files where text exist that needs to be translated is as follows:
+<ul>
+	<li> <font class="php_file">xmldata/indydatatypes/*.xml</font> 
+</ul>
+<p> This directory contains all the labels, titles and description text strings for the different modules such as
+<strong>article, newswire, comments, features etc</strong> display modules. To create for example a language
+specific version of the administration layout page for the newswire module, in say Spanish, you need to have a 
+Spanish version of the <font class="php_file">newswire.xml</font> file.
+Then when Oscailt recognises that a browser's language is set to Spanish it will automatically display those 
+versions by looking for XML files with the 'es' suffix.
+<p>
+So for this example using the language code <strong>es</strong> for Spanish, you need to create a XML file (for the
+newswire) with the name:
+<ul>
+	<li> <font class="php_file">xmldata/indydatatypes/<strong>newswire_es.xml</strong></font> 
+</ul>
+And in the first line, one must remember to change language code to <strong>es</strong>. The English versions
+will have <strong>en</strong> here instead.
+<strong>
+<pre>
+   &lt;indyType type="newswire" name="Newswire Module" language="es" version="1.0"&gt;
+</pre>
+</strong>
+To translate the other modules a similar pattern is used and for other languages, you use the languge code
+in both the filename and within the file for the language code. It is important to make use that it corresponds
+to the code that is configured in the <strong>Edit Languages</strong> administration page and it makes sense
+to use the defacto standards such as <strong>fr</strong> for French, <strong>de</strong> for German and so on.
+<p>
+There may still be a few strings in the modules that are hard coded in English and latter versions of Oscailt
+will have to deal with these.
+<p>
+
+<p>
+<a name="oscailt_ch6_4_">
+<h3> 6.4 General Language Support Background </h3>
+<!-- Courtsey of Mike's post to Oscailt mailing list --!>
+<i>Courtsey of Mike's post to Oscailt mailing list </i><p>
+Language display and character sets are quite a complicated thing for a php site.
+<P>
+In most cases the Latin character set should be enough for most if not all Spanish character sets, but generally 
+<strong>UTF-8</strong> is the best choice for any multilingual application.
+<p>
+To get it working correctly, you need to:
+<ol>
+<li> Make sure the database is using the correct character set and
+<li> Make sure our script (php) is reading the data correctly.
+<li> Make sure the Web Server is sending the data correctly.
+<li> Make sure the HTML page is displaying the data correctly.
+<li> Make sure any HTML forms send entered form data back correctly.
+<li> Make sure the script (php) sends new data to the database correctly.
+<li> Make sure the database stores new data correctly.
+</ol>
+
+If you go wrong at any point the data will end up getting messed up.
+<p>
+You can tell what the web server is using by checking a page downloaded from it and in the case the FireFox browser
+right click and <strong>View Page Info</strong> and look for <strong>Encoding</strong> which may well be set to 
+UTF-8. To find what the HTML is using, one can <strong>view source</strong> and the HTML may have a line
+something like, but there is no guarantee that it will be set.
+<strong><pre>
+     &lt;meta http-equiv=Content-Type content="text/html; charset=iso-8859-1"&gt;
+</pre></strong>
+To change this to UTF-8, then the header needs to be changed and in the case of Oscailt, this would require changing
+the file <font class="php_file">header.inc</font> to:
+<strong><pre>
+     content="text/html; charset=UTF-8"
+</pre></strong>
+Make sure that this meta tag is <u>before</u> the <strong>&lt;Title&gt;</strong> tag in the HEAD section.
+<p>
+The rest is tricky. See the links to language resources in <a href="#oscailt_ch15_6_">15.6 Unicode and UTF-8 </a>
+at the end of this document.
+
+<a name="oscailt_ch6_5_">
+<h3> 6.5 Unicode Support </h3>
+It is planned to use Unicode for multi language support by Oscailt sometime in a later release. This would 
+enable for all languages simultaneously. 
+However, this requires changing the code to use the <strong><u>multi-byte string</u></strong> functions in 
+<strong>PHP</strong> which is implemented in the PHP module <strong>mbstring</strong>. This is not installed 
+by default. These are essentially replacement functions for all the text functions in PHP.
+<p>
+Moving to Unicode would mean adopting the <strong>UTF-8</strong> character set throughout Oscailt including the
+MySQL database. This would mean all pages served would use the UTF-8 character set and all form input, RSS feeds
+and data storage as mentioned already.
+<p>
+It is very likely that hosting server would have to have <strong>PHP 5+</strong> installed as any earlier versions
+could potentially create too many problems. Also carefull consideration would be needed for migrating data on
+existing sites especially if any of this data is stored in any character set other than the (default) ISO-8859-1.
+
+<a name="oscailt_ch6_6_">
+<h3> 6.6 Text Not Easily Translated </h3>
+Clearly the code is written in English as are any of the comments. The code also contains some, but not much
+debugging messages. It has quite a few error and log messages and all of these are embedded throughout the code.
+There would be no easy way to make these configurable for the sake of translation. Another area of the code is
+the numerous references to types, options and meta-data. Often these point to the values of particular entities
+which themselves are available for translation and will be automatically picked up if the language settings 
+provide it.
+<p>
+The set of files in <font class="php_file">html/objects/indyruntime/*.inc</font> which deal with the display
+side of most of the module classes also contain a fair amount of displayable strings that should be 
+translated but at the moment are not separated out, into a form that would make this task relatively easy.
+<p>
+
+<a name="oscailt_ch7_introduction">
+<h2> 7. Log Files </h2>
+There are now <u>6</u> types of log files produced (formerly there was just 3 log files in the initial release of
+Oscailt 3.0). These appear in the  
+<font class="php_dir">html/logs</font> directory and can be read directly by users logged into Unix. However
+the Oscailt administration system can be used to view them and this is implemented by the file:
+<font class="php_file">html/viewsitelog.php</font> and it provides additional functionality. For example in the
+action log, the ids of hidden stories and comments become URLs allowing editors to quickly jump to those locations
+to view the text.
+<p> For the reported posts links are also provided to the reported articles and a hide status is attempted for
+the most recent reported posts.
+<p>
+For the Spam Mail, a method exists to select a message for forwarding to the email lists configured in the main
+administration configuration page. This would be used for retrieving valid email that got caught in the spam filter.
+<p>
+These files are written from various points within Oscailt and <font class="php_file">html/objects/utilities.inc</font> contains a number of basic utility functions for writing log entries.
+The following sub-sections detail what is contained in each of the various types of log files.
+
+<a name="oscailt_ch7_1_">
+<h3> 7.1 sitelog.txt </h3>
+All major errors are written to this file. Depending on the logging level it can also receive debug
+information. Currently it includes information about when the database cache is cleared.
+<a name="oscailt_ch7_2_">
+<h3> 7.2 actionlog.txt </h3>
+Every editor action on the public site is recorded here along with the 'reason' given. This covers hides, unhide,
+delete, edit, upgrade to story, downgrade to comment and optionally featurize. This is referred to as the <strong>
+Editorial Log</strong>.
+
+<a name="oscailt_ch7_3_">
+<h3> 7.3 securitylog.txt </h3>
+This records any attempts to add illegal html tags in the publish forms. These are defined in the file
+<font class="php_file">html/config/markupconfig.php</font>.
+<a name="oscailt_ch7_4_">
+<h3> 7.4 spamlog.txt </h3>
+This records any very long requests which tend to be typically spam and simply use up your bandwidth, database
+and CPU resources. The cut off length is configurable from the file
+<font class="php_file">html/objects/systemconfig.inc</font> although one should note that legimate requests
+generated from the search form or the archives page can generate relatively long and valid requests.
+<a name="oscailt_ch7_5_">
+<h3> 7.5 reported_post.txt </h3>
+When displaying this file, Oscailt expects to read the information in a particular format. The idea of this page
+is to help process reported posts as quickly as possible. It displays who sent the reported post, an active URL
+to the story or comment in question, the subject line and a button to view the body of the email. It uses Javascript 
+extensively to hold the body of the generated email and to enable hiding or showing of this.
+<a name="oscailt_ch7_6_">
+<h3> 7.6 spamlog_contact.txt </h3>
+The option for displaying this file is called SpamMail and it formats the emails that are consider spam in a similar
+way to reported posts above.
+
+
+<a name="oscailt_ch8_introduction">
+<h2> 8. Caching and the QueryCache Class </h2>
+This section does <b>not</b> cover the code cache. 
+
+<a name="query_caching">
+<a name="oscailt_ch8_1_">
+<h3> 8.1 The QueryCache Class </h3>
+This class is implemented by <font class="php_code"> querycache.inc </font> in <b>objects/</b>. It does not
+implement the code cache but it does handle the SQL, RSS and OML caches where the latter refers to the indymedia
+site lists for all the other indymedia sites. The cache works by storing data in cache files. These are stored
+in the directories:
+<pre>
+    -- html
+        |____ cache 
+	          |________ querycache  (stores oml and sql cache files)
+	          |________ rsscache
+
+</pre>
+and where the files names are of the form: <font class="php_code"> &lt;RndNumber&gt;.&lt;cache-type&gt;cache </font> 
+The random number used as part of the filename is not really random but comes from the <b>md5</b> hash algorithm. 
+It makes use of the RSA algorithm and the 'number' is a 32 character hexadecimal number which is returned when
+the query itself is presented to the algorithm. This is all built into PHP, so 
+basically one does not have to worry about it, because it manages and maps the numbers to the incoming query.
+The OML cache seems to consist of only one file, while the SQL cache can contain thousands of files due to all the
+potentially different queries. Example filenames are: <font class="php_file"> 
+<pre>
+      40df8e81072af5042370a81c21abdc67.<b>oml</b>cache
+      7fc1ca538846a21c5f01741aa07932d1.<b>sql</b>cache
+      ea1970b80aa131fb6881593d8efc2579.sqlcache
+      c74618490f38c08e2f2b1a34c072a13c.sqlcache
+</pre>
+</font>
+<p>
+The basic functionality provided by this object is to create, get, delete entries and clear the cache. It can
+also return the time of a cache entry which would by used by the SQL cache for timeouts, although it does
+really timeout except if a database error message itself was cached.
+<p> 
+<a name="oscailt_ch8_1_1_">
+<h4> 8.1.1 Database Cache </h4>
+The <b>SQL</b> cache is invoked from the SQL layer in file <font class="php_code"> objects/sqllayer.inc </font> 
+just at the point when a query is about to be passed to the underlying database layer or library. 
+Obviously only SQL SELECT statements can be cached and if the cache is enabled or marked as valid, a md5
+hash key is made from the SQL SELECT query and a check is made whether a file containing that key exists in
+the configured cache directory. The logic is:
+<font class="php_code"> 
+<pre>
+     <b>sql_query</b>   --&gt; 1. IF this query starts with 'SELECT' THEN
+				 a) Is caching enabled AND is cache valid?
+				 b) <b>getCachedData</b> (in QueryCache object) -see below
+                                 c)  If cache returned okay
+                                          i)  Check cache not older than cache-timeout
+					  ii) If too old, mark as cache result not found
+                                 d)  If cache result not found
+					  i)  If no database connection THEN connect to database
+					  ii) Pass query to database layer.
+					  iii) Cache the result.
+                     2. ELSE it must be an INSERT or UPDATE
+				 a) Invalidate the cache -marked to be cleared later.
+				 b) If no database connection THEN connect to database
+                                 c) Pass query to database layer.
+
+     b. (continuation from above)
+     <b>getCachedData</b> --&gt; 1. Generate hash-key via call to <b>md5</b> PHP function with input query string.
+                       2. Generate full path and filename from hash-key and query type and configured path.
+                       3. If file exists then read the data in the file.
+                              a) If file found then RETURN cached results.
+                              b) If file NOT found then RETURN NULL
+
+</pre>
+</font>
+The sql-layer contains some basic debugging which can be turned on by setting:
+<font class="php_code"> $sql_debug = 1 </font> in file <font class="php_code"> config/systemconfig.php </font> 
+
+<a name="oscailt_ch8_1_2_">
+<h4> 8.1.2 Database Connection(s) </h4>
+It will be noticed in the above logic for the cache that a 
+connection is <b>not</b> made to the database until it is required. If an INSERT or UPDATE is required it will
+connect, but if the SQL query is a SELECT, then if a cache entry is found, it will not need to connect. This
+can be verified by examining the function <font class="php_code"> sql_query </font> in
+<font class="php_file"> objects/querycache.inc </font> or by following the simplified logic above.
+<p>
+<b>Note:</b> You can determine the maximum number of database connections configured in MySQL by issuing the
+command:
+<pre>
+SHOW VARIABLES
+</pre>
+from within MySQL.
+<a name="oscailt_ch8_1_3_">
+<h4>8.1.3 Limitations of the Database Cache </h4>
+The design of the database cache is relatively simple and has served the needs of Oscailt well so far. However
+it is the simplest type of cache and it is constantly cleared and re-created each time there is any kind of
+update (insert or update) operation on the database. These types of operations can be initiated by users
+from adding stories and comments, and by editors by hiding or editing stories and features. Any sort of configuration
+change or even examination of the site layout objects will cause updates. This is because whenever an editor
+edits a story or comment or selects a layout element a lock insert is written to the database for that object.
+This means if there are significant editor actions being carried out that the cache will be getting cleared 
+much more often than it needs to and could impact performance.
+<p>
+A possible <b>solution</b> is to re-write the cache and to implement a much more complicated one that takes
+account of the different types of actions and is aware of the different types of query. This would probably
+take the form of dividing the cache up into different areas like: public, configuration, site admin and
+editor actions and only if an action overlapped into one of the other sections would it's section of the
+cache be rebuilt.
+<p>
+The effect would be to cut down on the number of times the whole cache is invalidated and when it is invalidated
+only parts of the cache would need to be rebuilt. This would allow it to recover quicker than at present
+and thereby keep the number of database connections lower.
+<p>
+<a name="oscailt_ch8_1_4_">
+<h4>8.1.4 Limitations: Update </h4>
+<strong>Update Dec Jan 2007:</strong> These suggested changes above have in fact now be implemented. The cache
+is now divided up into 5 groups as listed below. Depending on the type of change made that group or additional
+cache groups may be cleared. The tables belonging to each cache group are listed.
+
+<blockquote>
+<pre>
+1 config:              configuration, languages, topics, regions, types, banned_ips, editor_roles, 
+                       roles, role_permissions, editors
+  changes:             Clear 1, 2, 3, 4
+
+2 stories + comments:  stories, comments, attachments
+  changes:             Clear 2
+
+3 locks:               edit_locks
+  changes:             Clear 3
+
+4 site layout:         data_objects, master_data_objects
+  changes:             Clear 1, 2, 3, 4 
+
+5 statistics:          statistics querys older for data older than 1 month
+  changes:             Clear 5
+</pre>
+</blockquote>
+<p>
+The main code changes were to pass a (cache) group number whenever a call was made to the database layer and then
+some changes were made at the database layer and querycache for the file naming and invalidation of the cache.
+The cache file naming has been changed slightly to:
+<blockquote>
+<font class="php_code"> &lt;RndNumber&gt;.&lt;cache-type&gt;&lt;cache-group&gt;cache </font> 
+</blockquote>
+
+<pre>
+      7fc1ca538846a21c5f01741aa07932d1.<b>sql1</b>cache
+      ea1970b80aa131fb6881593d8efc2579.sql2cache
+      c74618490f38c08e2f2b1a34c072a13c.sql3cache
+      d23418490f384543542b1a34c072a13c.sql4cache
+</pre>
+
+<a name="oscailt_ch8_2_">
+<h3> 8.2 The Image Cache </h3>
+Oscailt has the ability to automatically generate thumbnails of images uploaded by users for display in the newswire
+and larger thumbnails for display within articles (stories). These are automatically cached. The location for
+this is configurable but would typically be something like: 
+<font class="php_dir">cache/imagecache/local/attachments</font>
+The files are then stored in a similar manner to the attachments which is organised by month and year. So you will
+end up with a set of directories like:
+<pre>
+    <font class="php_dir">cache/imagecache/local/attachments/jan2006</font>
+    <font class="php_dir">cache/imagecache/local/attachments/feb2006</font>
+    ....
+    <font class="php_dir">cache/imagecache/local/attachments/dec2006</font>
+</pre>
+Two important functions that refer to the <strong>image_cache</strong> variable are 
+<font class="php_code">getAttachmentFileFromCacheFile</font> (<font class="php_file">object/utilities.inc</font>) and
+<font class="php_code">getTransformedImageURL</font> (file <font class="php_file">object/imagetool.inc</font>, class
+<font class="oscailt_objs">ImageTool</font>)
+
+<a name="oscailt_ch8_3_">
+<h3> 8.3 Other Caches Used by Oscailt </h3>
+As mentioned earlier Oscailt has a <strong>code-cache</strong> which is basically a quasi-compiled version of each public page. What
+is quasi-compiled is the collection of elements, modules and layout elements that make up each page.
+<p>
+The other caches used by Oscailt are for: <strong>namecache, typedetails, redirect </strong> and 
+<strong>publishmonitorcache.inc</strong> cache. A further cache exists called 
+<strong>publishstatecache.inc</strong> which will be available in the next release and is used by the user status 
+and editor messaging facility.
+<p>
+The <strong>name cache</strong> is used by the administration layout pages and is cache of each object id and it's
+name which gets displayed in the administration page. It is cached because otherwise the full content of each
+object would have to be read from the database to get the object name.
+
+<a name="oscailt_ch9_introduction">
+<h2> 9. Editor Permissions and Roles </h2>
+In Oscailt 2.x, if you were an editor of the system you then automatically had the same permission as everyone
+else and could do any administration task, which basically was configuration, hides/unhides, deletes, edits,
+feature upgrade and downgrades and whatever other things were possible.
+<p>
+With Oscailt 3.x the administration functionality is very similar for stories and comments as in Oscailt 2.x, 
+but the administration
+for the configuration is more extensive whilst the site layout and design is new. There are now numerous
+different permissions for carrying out all sorts of different actions whether that be edits, hides, upgrades
+and the various new administration functions to do with configuration and layout.
+<p>
+In addition roles or levels of permissions, have been introduced so that different user accounts can be set up
+with different sets of permissions known as <strong>roles</strong>. By separating out the roles it means you
+can define a role for different types of users and then easily assign and maintain these roles, otherwise
+you would have to keep track a lot of different permissions for each user. Clearly though it is important
+to name and describe the roles otherwise it can make things even more confusing and complicated.
+<p>
+As if this is not flexible enough, roles are divided up into one of three types. These are:
+<strong>
+<ol>
+	<li> Administrative Roles
+	<li> Editorial Roles
+	<li> Site Builder Roles
+</ol>
+</strong>
+The roles are then assigned to users according to different sections of the site. 
+From an administration point of view (for the Indymedia site) there are 3 areas. These are:
+
+<ul>
+	<li> <b>Administrative Roles</b> <i>-contains <u>only Administrative</u> roles </i>
+	<li> <b>Site 1 - News site Roles</b> <i>-can contain either <u>Editorial and Site Builder</u> role types</i>
+	<li> <b>Site 2 - RSS Feeds Roles</b> <i>-can contain either <u>Editorial and Site Builder</u> role types</i>
+</ul>
+It is possible with Oscailt 3.x to add further 'sites' which are basically different sections of the site
+that are divided up for ease of layout and maintenance. 
+<p> So to help explain this further, we might have 3 types of users. Lets say we have an Administrators (admin_user) 
+with access to everything, a site moderator (mod_user1) who can hide, delete, edit and featurize stories and 
+a feature writer (feature_user1) who writes
+just features. Then for this example, we might define 3 roles as: <strong>total administrator</strong>, 
+<strong>full editorial</strong>, <strong>moderator</strong> and a <strong>feature writer</strong>.
+We then would assign the roles to user as:
+<ul>
+	<li> <b>admin_user</b> <i>-has <u>Total Administrator</u> and <u>Full Editorial</u> roles </i>
+	<li> <b>mod_user1</b> <i>-has <u>Moderator</u> role</i>
+	<li> <b>feature_user1</b> <i>-has <u>Feature Writer</u> role </i>
+</ul>
+and in turn <strong>Total Administrator</strong> will be given permissions for all Administrative 
+and Site Builder roles while the <strong>Full Editorial</strong> role would contain all the permissions for
+editorial actions (like edits, hides, deletes).
+The <strong>Moderator</strong> role will most likely be only given permissions for Editorial roles.
+and Site Builder sections.
+The <strong>Feature Writer</strong> will most likely be given a smaller subset of permissions for only
+the Editorial role. For example they would have permission to edit and see hidden features, but not to hide or
+delete comments. 
+
+<a name="oscailt_ch9_1_">
+<h3> 9.1 Important Files for Permissions and Roles </h3>
+The main php files for implementing the edit editors and edit roles administration pages are:
+<font class="php_file"> editeditors.php, editroles.php </font> and in <b>objects/</b>
+<font class="php_file"> editorpermission.inc, editor.inc </font> and <font class="php_file"> role.inc </font> 
+The first two files implement allocating the roles to editors and defining the roles themselves respectively.
+It is worth looking at the permissions file because that holds an array of all the different types of 
+permissions. 
+<a name="oscailt_ch9_2_">
+<h3> 9.2 Data for Permissions and Roles </h3>
+The permissions and roles for the 'Total Administrator' role are pre-setup during installation by adding records
+for them in the ROLES and ROLES_PERMISSIONS database tables. As other permissions and roles are defined, these
+two are also stored in the database. The EDITORS table is linked to the ROLE table via the column ROLE_ID which
+allows the roles assigned to each user to be stored.
+<a name="oscailt_ch9_3_">
+<h3> 9.3 Role Permissions </h3>
+For each of the 3 different types of role there are different permissions. In the edit section of the Edit Roles
+administration page, these are loaded with the function <strong>loadSitePermissionsOptions</strong> 
+( in <font class="php_file"> editroles.php </font>) which picks up the permissions array which are defined in file 
+<b><font class="php_file"> html/config/permissions.php </font></b> This file gets included by
+<font class="php_file"> html/config/configuration.php </font> which in turn is included by
+<font class="php_file"> html/objects/systemconfig.inc </font> which always gets included. 
+The variable <font class="php_code"> $permissionsList </font> is global and is the above array. It can be seen from 
+the editroles.php file. This array is an array of admin, editorial and site arrays.
+<p>
+In the case of the site builder role the above function loads up all object types by reading the xmldata\indydataclasses directory and generates: <strong>create, delete </strong>and <strong>edit </strong> options for each object
+type in addition to the approximately 4 predefined permission options in the array for it. This is done because
+it enables the system to assign create, delete and edit permissions to each object type.
+<p>
+When the permissions and roles are set for an editor, this data then gets storied to the database for that editor
+and later when that editor logins in, this information is read from the database and held in memory in the 
+editorrole and editorpermission objects which are instances of classes of the same name.
+
+<a name="oscailt_ch9_3_1_">
+<h4> 9.3.1 Code Changes and Permission Updates</h4>
+From this it follows, if new functionality is added to Oscailt, then ideally one should also update the
+editor permissions code. From the previous section, it is clear the main file to update is: 
+<font class="php_file"> html/config/permissions.php </font> and then depending on the nature of the change,
+other files will need to be updated. For example if a new editor action was added, then 
+<font class="php_file"> html/objects/itemaction.inc </font> would have to be updated along with any files
+that setup the options for display.
+
+
+<a name="oscailt_ch9_4_">
+<h3> 9.4 Permissions in Action</h3>
+In the administration section of the site, the implementation of the permissions is quite straight forward.
+From the administration screen as you click on each icon and go to that item, the associated PHP script is called.
+So for example, for <strong>topics</strong> the first bit of code checks you are logged in. Then it checks if you 
+have the read permissions and then if any modifications are made it does the check for write permissions.
+Basically the code is:
+<font class="php_code"> 
+<pre>
+  if($editor_session->editor->allowedReadAccessTo("edittopics"))
+  {
+      Load and display topics.
+  }
+</pre>
+</font> 
+<p>For the editorial permissions it is not so simple. This is because it covers the functionality for story and 
+comment edits, hides, unhides, deletes, clip, unclip, upgrade, downgrade and feature options and the implementation 
+of these now resides deep inside objects like
+<font class="php_file"> html/objects/indyruntime/articledisplay.inc </font> which displays these options and
+<font class="php_file"> html/objects/indyruntime/managingdisplay.inc </font> which manages the option and
+handling of permissions and calling the appropriate procedures for carrying out the editorial actions.
+This latter file is help by the functionality in <font class="php_file"> html/objects/itemaction.inc </font> 
+
+
+<a name="oscailt_ch10_introduction">
+<h2> 10. Module Specifics </h2>
+<a name="oscailt_ch10_1_">
+<h3> 10.1 Contact Form including Reported Posts </h3>
+The contact form is the basic contact form module and is currently used in two basic modes to act as a basic
+<strong>contact form</strong> and to act for the <strong>reported posts</strong> facility.
+As with the other core modules, the contact module needs to be specified in a page layout to control where and
+how it is displayed. For example whether it will have top menu and banner and side bars. The configurable
+parts of the contact form are controlled via the XML in the administration site layout section. 
+(See <a href="#oscailt_design_fig8">Figure 8</a>). The controlling files work as follows (<i>and this is broadly
+similar for other modules as outlined above.</i>
+<p>
+<blockquote>
+<p>
+<ul>
+	<li> <font class="php_file">xmldata/indydatatypes/contact.xml</font> -This file contains categories that 
+	will be displayed in the page layout for this option. This file can be added to, to add new functionality.
+
+	<li> <font class="php_file">objects/indyobjects/indydataclasses/indycontact.inc</font> -This next file is... 
+
+        <li> <font class="php_file">objects/indyruntime/contactdisplay.inc</font> -This file implements 
+	the bulk of the contact form functionality. It handles the display and all related requests such as 
+	when the form is submitted and then the validation and final sending of the email. The configuration 
+	and associated string objects for text are read.
+</ul>
+</blockquote>
+The contact form has had extra functionality added to it to improve the validation and to implement anti spam
+measures. This has taken the form of adding basic encryption to some of the form fields and addition of other
+mandatory hidden fields. As part of this measures there is validation on some of the incoming request header
+parameters. Dealing with spam is a moving target and probably the best approach is to deploy an array of 
+barriers rather than any one technique.
+Also added has been configurable options to log requests that have been judged to be spam and when
+operating in reported post mode, it will not log these requests in a special format that can be viewed by
+the <strong>view logs</strong> facility from within the administration side of Oscailt.
+<a name="oscailt_ch10_1_1_">
+<h4> 10.1.1 Reported Posts </h4>
+The reported posts is the facility whereby a (public) user can from any story or comment click on a icon which
+will bring them to a contact form with the URL and title to that story and or comment pre-filled and enable them
+to report posts that they think break the guidelines or whatever. When this form is submitted, it is then
+emailed to the pre-configured email list. The latest functionality additionally logs this to a file also.
+
+
+<a name="oscailt_ch10_2_">
+<h3> 10.2 The Publish Form </h3>
+<a name="oscailt_ch10_2_1_">
+<h4> 10.2.1 Overview </h4>
+The <strong>publish form module</strong> is another example of a relatively standalone component of Oscailt and
+is relatively easy to modify. However the key to understanding and making any changes to it, is to realize 
+that it does a number of things and works in various modes. There is the initial edit mode, where data is entered
+into fields for the first time, and then a preview mode which previews the data entered so far and allows for
+further editing of the form fields. 
+<p>
+The publish form is also used by Oscailt editors when logged in to edit stories, features and comments and it
+must therefore be able to read the contents of a story or comment and preload the appropriate fields.
+<p>
+The publish form also works in another mode where it can accept input for uploading files. In this mode, one
+cannot proceed to the preview mode because of the nature of the HTML form field of type file which does not
+allow the value to be set by the browser in advance or by Javascript as it would be a big security hole. This
+means on the preview cycle, the form can't remember and then refill this field.
+
+<p> Then as a further complication, depending on whether story or comment is being published, not all panels or
+sections are displayed, with comments have fewer fields to fill in. Lastly, Oscailt allows editors to edit
+stories and comments, and to do this it makes use of the publish form. This means that it has to be able
+to distinguish between the a new story or comment and the editing of an existing story or comment.
+<a name="oscailt_ch10_2_2_">
+<h4> 10.2.2 Components </h4>
+The controlling files work as follows (<i>and this is broadly
+similar for other modules as outlined above.</i>
+<p>
+<blockquote>
+<p>
+<ul>
+	<li> <font class="php_file">xmldata/indydatatypes/publish.xml</font> -This file contains categories that 
+	will be displayed in the page layout for this option. This file has to be modified if new functionality 
+	or other options are to be made available in the module definition. For the publish form, this is quite
+	a big file compared to the other ones because of the large number of items.
+
+	<li> <font class="php_file">objects/indyobjects/indydataclasses/indypublish.inc</font> -This is used 
+	during code cache execution to populate the various arrays of choices and options made during the module
+	definition for a particular instance of this class.
+
+        <li> <font class="php_file">objects/indyruntime/publishdisplay.inc</font> -This file implements 
+	the bulk of the publish form functionality. It handles the display and all related requests such as 
+	when the form is submitted and then the validation and final sending of the email. The configuration 
+	and associated string objects which are contained within the code cache file for that object are read
+	from within this.
+</ul>
+</blockquote>
+<a name="oscailt_ch10_2_3_">
+<h4> 10.2.3 Publish Processing </h4>
+The form has quite a lot of module and system configurable parameters to check, because a (publish) form can be
+configured to enable or disable the publishing of images, audio, video and miscellaneous file types and can control
+the maximum file sizes of each and the number. In addition this can be specific to stories and comments. 
+<p>
+Most of the other form fields are also configurable as to whether they appear or not. All of the text and titles,
+prompts, headings and help tips are also configurable at module level (through the admin site layout screens).
+This is to facilitate both multiple languages and customisation.
+<p>
+Stories and or comments published can also be configured to be automatically hidden and even publishing itself
+can be turned on or off for the public but remain active for editors, which makes for a very versatile system.
+<p>
+When a form is submitted for preview there are multiple checks that have to be made from validation on all the
+fields to ensure that they are filled in, checks for banned IPs, checks for a valid publishing token, to edit
+lock checks and checks on attachments sizes.
+
+<a name="oscailt_ch10_3_">
+<h3> 10.3 Events and Events Display </h3>
+<a name="oscailt_ch10_3_1_">
+<h4> 10.3.1 Overview </h4>
+Events at one level are simply another type of story in Oscailt. Events like all other stories get stored in the 
+<strong>STORIES</strong> table although there is an a special table column called <strong>EVENT_TIME</strong> 
+which is only used for events. At the moment, only the date part of this timestamp field is used and it
+cannot be used to specify the time of the event on the particular date.
+<p> Originally events were the 5th story type to be added to Oscailt, so there may be places in the code where
+it is still hard coded to check <strong>type_id==5</strong>.
+
+<a name="oscailt_ch10_3_2_">
+<h4> 10.3.2 Displaying Events </h4>
+Events can be displayed in three different modes which are monthly, bi-weekly or weekly. The latter two are
+almost identical. In each month links are generated that allow to user to navigate forward and backward in
+time by a month and a week respectively. This involves setting various extra parameters that appear in the URL.
+<p>
+A considerable amount of code effort is required to generate these and ensure that invalid values are detected
+and appropriate defaults used. For example, the code must check that the user does not try to go back to before
+the time for the first story / event in the database.
+<p>
+The monthly display mode can show up to three separate months of events and these are grouped accordingly,
+with past, present and future events get different display colours through specifying different classes
+from the style sheets. Recent changes have included detection of zero events for the current day, but still
+displaying a message to that effect. Other features include hiding past events, so that &quot;today's &quot;
+events don't appear way down the page. This can be toggled.
+<p>
+For weekly and bi-weekly code the same function is used with a certain amount of duplication within it. The
+tricky part is generating the correct forward and backward links as month and year boundaries are crossed.
+The weekly/biweekly mode high-lights the current day of the week and this requires effort in the default mode
+to work out which should be the first date to display and again account for going back to previous months.
+
+<a name="oscailt_ch10_3_2_1_">
+<h5> 10.3.2.1 Core Files for Event Functionality </h5>
+<blockquote>
+<p>
+<ul>
+	<li> <font class="php_file">xmldata/indydatatypes/events.xml</font> -This file contains categories that 
+	will be displayed in the page layout for this option. This file has to be modified if new functionality 
+	or other options are to be made available in the module definition. 
+
+	<li> <font class="php_file">objects/indyobjects/indydataclasses/indyevents.inc</font> -This is used 
+	during code cache execution to populate the various arrays of choices and options made during the module
+	definition for a particular instance of this class.
+
+        <li> <font class="php_file">objects/indyruntime/eventsdisplay.inc</font> -This file implements 
+	the bulk of the functionality for display events. It handles monthly, bi-weekly and weekly display modes, 
+	including the request handling for managing this. 
+</ul>
+</blockquote>
+
+
+<a name="oscailt_ch10_3_3_">
+<h4> 10.3.3 Events and the Publish Form </h4>
+The publish form has some Javascript code (which executes in the browser) that will display a drop down
+lost of days and months and year if the user selects a story type of event for publishing.
+
+<a name="oscailt_ch11_introduction">
+<h2> 11. Changing Code and Adding New Functionality </h2>
+<a name="oscailt_ch11_1_">
+<h3> 11.1 Overview </h3>
+If you decide to add any new functionality to Oscailt, then it is important to try make these changes within
+the overall framework or model of Oscailt, otherwise given sufficient changes, the code will drift away
+from this model and become inflexible and un-maintainable in the long run. One's enthusiasm often is best
+maintained when changes are made relatively easy and the impacts are relatively immediate and of substantial
+benefit but the complex nature of the present system doesn't really lend itself to that. This is why documentation
+such as this is vital so that details of the internal design and structure of Oscailt can be made readily
+available and accessible and it also means that it must be kept up to date too.
+<p>
+There are certain areas of Oscailt which are harder to change than others because they are tightly integrated
+while others areas are relatively independent and thus easier to change. Examples of the latter are much of
+the Administration functionality like viewing log files, the IP monitor, configuration changes, editing editors,
+roles, types, regions, statistics, bulk deletes. The publish
+form is another example of a module that is not too tightly coupled with the rest of the system. In all of these
+cases the bulk of the functionality is implemented in just one file.
+<p>
+Examples of changes that <strong>require more effort</strong> are any additions to the story and newswire modules 
+and any associated functionality like display and editorial actions. (e.g. hide, edit). It is probably relatively
+easy to hack the code and just add in whatever changes you wish, but this will mean that it is not very
+configurable and it disrupts the ability to make the code language dependent.
+
+<a name="oscailt_ch11_2_">
+<h3> 11.2 Process to Follow </h3>
+It may be stating the obvious, but the best procedure to making changes is to have your own Oscailt test installation and a copy of the code checked out from the SourceForge CVS for Oscailt. Oscailt can be installed on Windows
+PCs as easily as Linux. See Appendix B for some development resources.
+<p>
+Then as changes are made they can be tested and refined. The tricky part is re-integrating the code and ensuring
+that debug type information is removed and any other special hacks. It is also important to be careful with
+the various versions that you have in development as experience shows they can rapidly drift apart from the
+main code base. Tools such as <strong>WinDiff</strong> can prove to be very useful in that regard.
+<p>
+It is even more ideal to have a second installation where the sanitized code is kept up to date with changes from
+CVS so that it can be used as a final test site. Keeping a discipline in that regard can often be the biggest
+barrier.
+
+<a name="oscailt_ch11_3_">
+<h3> 11.3 Points to Consider </h3>
+There are some key points to consider when making changes to Oscailt. These are...
+
+
+<a name="oscailt_ch12_introduction">
+<h2> 12. Exports and Dump Files </h2>
+The Administration system offers the ability to export site layout configuration and to dump various files.
+It produces 2 types of files. These are XML and .DMP files. The XML files generally contain object definition,,,
+TBD
+The principle files involved in the implementation of this functionality are listed below and these cover the classes
+<font class="oscailt_objs">indyImportExport</font> from which are derived <font class="oscailt_objs">indySiteExporter</font> and <font class="oscailt_objs">indySiteImporter</font>.
+<ul>
+	<li> <font class="php_file">editexport.php</font> -This will be called from the administration page 
+	and is used for the initial drawing of the screen. It handles the request to determine whether it is 
+	for the inital draw or to save the data that has been imported. It also generates the confirmation dialogue
+	boxes. Finally this file will also create an instance of the <font class="oscailt_objs">indySiteExporter</font> class.
+	<li> <font class="php_file">editimport.php</font> -This is pretty much the same as for the above file
+	except for importing.
+	<p>
+	<li> <font class="php_file">objects/indyobjects/indyimportexport.inc</font> -This retrieves the collection
+	of objects for importing or export and has functions for drawing a screen providing a selection of choices
+	for whatever is to be selected for import or export.
+	<li> <font class="php_file">objects/indyobjects/indysiteexporter.inc</font> -This has additional code
+	for managing and handling the choices and submission of objects for export. The rest of the code deals 
+	with the export of objects like stories, attachments, categories, and other general stuff.
+	<li> <font class="php_file">objects/indyobjects/indysiteimporter.inc</font> -This file needs more code 
+	because it has to be able to read and interpret the files in addition to the building and drawing of the
+	menus and choices for the selection of those objects to be imported. 
+</ul>
+
+<a name="oscailt_ch13_introduction">
+<h2> 13. Use of Style Sheets in Oscailt</h2>
+<a name="oscailt_ch13_1_">
+<h3> 13.1 Overview </h3>
+Oscailt has been using HTML style sheets since version 2.x and their usage has increased even further since that
+time. For those unfamiliar with these, it is worth looking over the <strong>Cascading Style Sheets</strong>
+specifications. 
+<p>
+The use of style sheets allow great flexibility in the look and feel to the site but since there are so many
+classes now present these really need to be documented and their usage in the code should be made consistent
+to ensure that when colours and fonts are changed the results are predictable.
+<p>
+There are some style sheets in the Oscailt CVS under the path <font class="php_dir">html/graphics/</font> but
+these do not seem to be the ones used and instead there is a default configuration pointing to the directory
+<font class="php_dir">html/attachments/sites/default/</font> where the following three files can be edited
+through the Administration interface.
+<ul> 
+	<li> <font class="php_dir">html/attachments/sites/default/common.css</font> 
+	<li> <font class="php_dir">html/attachments/sites/default/style.css</font> 
+	<li> <font class="php_dir">html/attachments/sites/default/contentstyle.css</font> 
+</ul>
+These files appear to actually be part of the IMC Ireland import set of files.
+<p>
+
+<a name="oscailt_ch14_introduction">
+<h2> 14. Appendix A - Some Background on Objects, Classes, Functions and Methods </h2>
+<a name="oscailt_ch14_1_">
+<h3> 14.1 Introduction </h3>
+This appendix provides some background to object programming and some general principles and guidelines. This
+notes should provide a good starting point if you are unfamiliar with these concepts and you are trying to
+understand the Oscailt code base.
+<p>
+Object programming was introduced in the late 80s / early 90s and was quite a break from existing procedural
+languages. With object programming you can define objects that represent particular things and combine the
+data and code together. Then if you want a whole pile of these things, you just create a whole pile of the
+same object types. And if you then want to define something new but similar to something you already have, 
+then the idea is that you can extend the object and create a new type derived from an existing one you have
+and at the same time build on any of the code you have written and data you have defined for that object.
+<a name="oscailt_ch14_2_">
+<h3> 14.2 Classes and Objects </h3>
+These are really the same thing. The class represents the definition and the minute you create one of these,
+it is then called an object. So in the files you will see declarations like: 
+<p>
+<font class="php_code">
+<pre>
+   class Story
+   <i> and or </i>
+   class Comment
+</pre>
+</font>
+It can be seen that for a given story there could be say 20 comments and by using objects we can create a
+story object and then retrieve the 20 comments belonging to it and create a comment object for each one.
+We would probably write or define a class for story so that it expects to contain or hold one or more
+comment objects.
+<p>
+<a name="oscailt_ch14_3_">
+<h3> 14.3 Functions and Methods </h3>
+Every object has what is called a set of <strong>methods</strong> associated with it. In reality you can think
+of them as functions and <strong>php</strong> uses this terminology. Other programming languages like C++ tend
+to stick with the methods terminology.
+<p>
+The interesting thing about these functions is that you use the same name over and over again for different 
+classes. So your <b>story</b> and <b>comment</b> classes might both have functions called <strong> load </strong>
+and <b>display</b>. In theory this makes it easier, because you would expect these kind of functions. <i>This is
+often referred to as <strong>overriding</strong> the function.</i> The
+advantage over a procedural language is that you would have to put in say your display code some kind of variable
+to tell you what you are displaying and then basically divide the code internally up into two parts. With objects
+as can be seen everything is kept nice and separate. And with programming clarity is the name of the game.
+<p>
+Typically it is general programming convention for any object to provide what are called:
+<b>set</b> and <b>get</b> accessor functions. This really means that rather than getting data inside an object
+directly and manipulating it, you provide functions something like, say for the data called:<b>type</b>
+<font class="php_code">
+<pre>
+   function getType()  
+   {
+       return $this-&gt;type;
+   }
+
+   function setType( $value) 
+   {
+       $this-&gt;type = $value
+   }
+</pre>
+</font>
+The functions will often be as simple as this and at other times more complicated. At times it may seem like
+overkill but once again it is essential discipline to maintain demarcation between the inside and outside of
+objects.
+<a name="oscailt_ch14_3_1_">
+<h4> 14.3.1 Syntax and Conventions </h4>
+In object programming the syntax for calling a function belonging to an object is illustrated in this
+example of creating the story with $id:
+<font class="php_code">
+<pre>
+   $story_obj = new Story( $id )
+   
+   .... do other stuff as neccessary ...
+
+   $story_obj-&gt;display();
+
+</pre>
+</font>
+As we can see it is: <font class="php_code">objectInstance-&gt;functionName() </font> 
+If you are within an object and you want to call one of the functions belonging to that object then it
+is general convention to self-refer to this object with the <b>this</b> keyword. The example here
+shows how you can refer to both data and call a function.
+<font class="php_code">
+<pre>
+
+   $this-&gt;$directory_path_to_data = "xmldata\blah_blah\"
+   $this-&gt;load( $this-&gt;$directory_path_to_data );
+
+</pre>
+</font>
+You will see plenty examples of that sort of thing throughout the Oscailt code.
+
+
+<a name="oscailt_ch14_4_">
+<h3> 14.4 Object Data </h3>
+The last paragraph brings us neatly to the idea of object data. In object programming one of the basic
+principles is to tie your data and code into, well eh objects. With procedural languages these two can be
+all over the place and it tends to encourage data to be shared all over the code with the result there is
+so much code manipulating it that the whole thing (codebase) becomes like spaghetti. By keeping blocks
+of data separate in objects and the code needed to manipulate or work on that data separate in the same
+object with it, the goal is to cut down on spaghetti code and produce something more useable and maintainable.
+Of course programmers have often gone out of their way to work against this principle. In reality it is 
+never so simple either. By understanding what the principles of using objects at least we can see what is
+intended.
+<p>
+In other languages like C++ object data can be defined as public, private or 'friendly'. The first two are
+obvious whilst the third is somewhere in between and not worth going into since we don't have to worry about it
+here.
+<a name="oscailt_ch14_5_">
+<h3> 14.5 Class Inheritance </h3>
+With all object oriented languages it is possible to inherit classes. What this means is that you can create or
+define a new class based on an existing one. The idea is to help reuse code and borrows again biological 
+concepts, where the equivalent is a cell and then the different cell types. In the case of Oscailt, you
+might define a basic display class and then derive ones from it called story, feature, comment.
+<p>
+When you inherit or <strong>extend</strong> as the terminology is in PHP, then you automatically get all
+the data and functions in the classes that you have inherited or extended. That means you only have to write
+the extra code and include any additional data that you need. In some cases you may rewrite some of the functions
+to do something different. If you do the latter PHP will know about it and will not get confused about which
+one to call, because the one you define will take precedence over the one in the base class.
+<p>
+The syntax with an example for class inheritance in PHP is:
+<font class="php_code">
+<pre>
+      class myNewClass extends AnExistingClass
+
+      class filterDisplay extends displayObject
+</pre>
+</font>
+
+<a name="oscailt_ch15_introduction">
+<h2> 15. Appendix B - Some Resources </h2>
+<a name="oscailt_ch15_1_">
+<h3> 15.1 PHP Manual </h3>
+For a handy online PHP help manual see:
+<a href="http://ie.php.net/quickref.php">http://ie.php.net/quickref.php</a>
+<p>
+A problem that continually causes problem with new users of Oscailt is that they have the problem where any
+special characters are preceded by a slash ('\') which generates more in turn. The solution is the PHP
+<strong>'magic quotes'</strong> setting which apparently can be controlled from .htaccess apache file.
+<p>
+<a name="oscailt_ch15_2_">
+<h3> 15.2 Editor Tool </h3>
+The freeware text editor <strong>gvim</strong> is quite a useful tool to use, especially when the PHP syntax
+mode is on.
+<a name="oscailt_ch15_3_">
+<h3> 15.3 File Difference and Merge Tools for Windows </h3>
+The file difference graphical tool <strong>WinDiff</strong> can prove very useful for finding differences.
+Also <strong>WinMerge</strong> is very useful too. Unfortunately both of these appear to be Windows only tools.
+
+<a name="oscailt_ch15_4_">
+<h3> 15.4 Development Environment Tool </h3>
+The freeware <strong>Eclipse</strong> development environment has proved to be popular in the Open Source / Freeware
+community. <u>Be sure that you set the <strong>carraige-return linefeed</strong> settings correctly otherwise it
+leads to an unmanageable mess with CVS because extra blanks lines can get added to files as they cross the 
+Windows - Unix/Linux barrier where such translations are done and it becomes next to impossible to work with
+files that are now suddenly double the length and can't be diff-ed properly with the CVS diff tools</u>.
+
+<a name="oscailt_ch15_5_">
+<h3> 15.5 CVS Source Control </h3>
+The Oscailt source code is managed under the popular <strong>CVS</strong> software. One should be quite familiar
+with this before attempting to check in Oscailt files. If you use this then be sure that your Windows to Unix
+text file settings are correct otherwise the translation of <strong>cr lf</strong> to <strong>lf</strong> on Unix
+can get very confusing and additional blanks lines will appear in the code making it impossible to do meaningful
+comparisons to previous versions.
+<p>
+For Windows PCs, a reasonably good tool to use is <strong>WinCVS</strong>. 
+<p>
+When working with SourceForge CVS, you need to generate a SSH key which consists of a public and private key
+and you upload a copy of the public key to SourceForge. 
+<p>
+<strong>Note:</strong> <br><strong>lf</strong>: Linefeed (hex 0x0A)
+<br>
+<strong>cr</strong>: Carrige Return (hex 0x0D)
+<a name="oscailt_ch15_6_">
+<h3> 15.6 Unicode and UTF-8 </h3>
+See the following resources for discussion of UTF-8 and PHP
+<ul>
+	<li><a href="http://developers.sun.com/dev/gadc/technicalpublications/articles/utf8.htm">What is UTF-8 And Why Is It Important?</a><p>
+<li> This link here is a very good discussion covering UTF-8 and PHP with lots of links to other good articles and
+sites on the issue.<br>
+<a href="http://www.phpwact.org/php/i18n">Character Sets / Character Encoding Issues</a> <p>
+<li>
+<a href="http://www.nicknettleton.com/zine/php/php-utf-8-cheatsheet">PHP UTF-8 Cheatset</a><p>
+<li>
+<a href="http://www.phpwact.org/php/i18n/utf-8">Handling UTF-8 with PHP</a><p>
+</ul>
+<hr>
+Back to <a href="Oscailt_3x_design_toc.html">Table of Contents</a>
+<p>
+<i>Last updated: June 2008</i>
+</body>
+</html>

@@ -1,0 +1,71 @@
+# The following directives are required by oscailt to allow the url redirection to work
+# They also provide extra security by forbidding access to any other urls that are not part of oscailt
+# If you have extra real files and directories under this directory that you want to make accessible
+# You can do so by adding them as specific subdirectories
+#
+
+
+DirectoryIndex index.php index.html index.htm 
+
+#Bizzarely, we need to follow sym links for windows apache (despite not using symlinks)
+Options FollowSymLinks
+
+#these are required by oscailt - can also be set in php.ini
+php_value session.use_trans_sid 0
+php_flag magic_quotes_gpc off
+php_flag register_globals off
+
+#send everything to index.php with the remainder as an argument
+RewriteEngine on
+
+# do not redirect files for real pages
+RewriteCond  %{REQUEST_URI}  !^((.*)index.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)test.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)admin.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)install.php)$
+
+RewriteCond  %{REQUEST_URI}  !^((.*)stylefilter.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)bulkdelete.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)stats.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)clearcache.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)feedsmanage.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)viewarticles.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)viewobjects.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)viewsitelog.php)$
+
+# admin pages
+RewriteCond  %{REQUEST_URI}  !^((.*)editbannedips.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editbannedauthors.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editconfiguration.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editeditors.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editexport.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editimport.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editimage.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editlanguages.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editmonitor.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editredirects.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editregions.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editroles.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editorstatus.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)editspam.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)edittopics.php)$
+RewriteCond  %{REQUEST_URI}  !^((.*)edittypes.php)$
+
+# do not redirect files for graphics and attachments subdirectory
+RewriteCond  %{REQUEST_URI}  !^((.*)/tinymce/(.*))$
+RewriteCond  %{REQUEST_URI}  !^((.*)/openwysiwyg/(.*))$
+RewriteCond  %{REQUEST_URI}  !^((.*)/javascript/(.*)js)$
+RewriteCond  %{REQUEST_URI}  !^((.*)/graphics/(.*))$
+RewriteCond  %{REQUEST_URI}  !^((.*)/attachments/(.*))$
+RewriteCond  %{REQUEST_URI}  !^((.*)/cache/imagecache/(.*))$
+RewriteCond  %{REQUEST_URI}  !^((.*)favicon.ico)$
+
+#add in any real subdirectories that you have as follows.
+#RewriteCond  %{REQUEST_URI}  !^((.*)/oscailt/(.*))$
+#RewriteCond  %{REQUEST_URI}  !^((.*)/archives/(.*))$
+#RewriteCond  %{REQUEST_URI}  !^((.*)/article133/(.*))$
+#RewriteCond  %{REQUEST_URI}  !^((.*)/WEBALIZER_REPORTS/(.*))$
+
+
+RewriteRule ^(.*)$ index.php?redirect=$1 [QSA] 
+

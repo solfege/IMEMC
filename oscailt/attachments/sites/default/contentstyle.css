@@ -1,0 +1,266 @@
+/* stylesheet for styling content such as features and so on */
+
+div.feature-inset
+{
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	padding: 6px;
+	margin: 6px 0px 6px 0px;
+	border: #B8f8B8 2px solid;
+	clear: both;
+}
+
+div.feature-inset-left-200
+{
+	width: 200px;
+	float: left;
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	padding: 6px;
+	margin: 6px 6px 6px 0px;
+}
+
+div.feature-inset-right-200
+{
+	width: 200px;
+	float: right;
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	padding: 6px;
+	margin: 6px 0px 6px 6px;
+}
+
+div.feature-inset-left-300
+{
+	width: 300px;
+	float: left;
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 6px 6px 0px;
+}
+
+div.feature-inset-right-300
+{
+	width: 300px;
+	float: right;
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	padding: 6px;
+	margin: 6px 0px 6px 6px;
+}
+
+div.feature-inset-left-400
+{
+	width: 400px;
+	float: left;
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	padding: 6px;
+	margin: 6px 6px 6px 0px;
+}
+
+div.feature-inset-right-400
+{
+	width: 400px;
+	float: right;
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	padding: 6px;
+	margin: 6px 0px 6px 6px;
+}
+
+div.feature-inset-left-500
+{
+	width: 500px;
+	float: left;
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	padding: 6px;
+	margin: 6px 6px 6px 0px;
+}
+
+div.feature-inset-right-500
+{
+	width: 500px;
+	float: right;
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	padding: 6px;
+	margin: 6px 0px 6px 6px;
+}
+
+
+div.feature-inset2
+{
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 0px 6px 0px;
+	border: #B8f8B8 2px solid;
+	clear: both;
+
+}
+
+div.feature-inset2-left-200
+{
+	width: 200px;
+	float: left;
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 6px 6px 0px;
+}
+
+div.feature-inset2-right-200
+{
+	width: 200px;
+	float: right;
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 0px 6px 6px;
+}
+
+div.feature-inset2-left-300
+{
+	width: 300px;
+	float: left;
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 6px 6px 0px;
+}
+
+div.feature-inset2-right-300
+{
+	width: 300px;
+	float: right;
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 0px 6px 6px;
+}
+
+div.feature-inset2-left-400
+{
+	width: 400px;
+	float: left;
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 6px 6px 0px;
+}
+
+div.feature-inset2-right-400
+{
+	width: 400px;
+	float: right;
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 0px 6px 6px;
+}
+
+div.feature-inset2-left-500
+{
+	width: 500px;
+	float: left;
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 6px 6px 0px;
+}
+
+div.feature-inset2-right-500
+{
+	width: 500px;
+	float: right;
+	background-color: #efefef;
+	padding: 6px;
+	margin: 6px 0px 6px 6px;
+}
+
+div.feature-image-right
+{
+	text-align: center;
+	float: right;
+	margin-left: 3px; margin-right: 2px; margin-top: 0px; margin-bottom: 4px;
+}
+
+div.feature-image-left
+{
+	text-align: center;
+	float: left;
+}
+
+
+img.feature
+{
+	margin: 2px 4px 2px 4px;
+	border: #000000 1px solid;
+}
+
+div.featured-links-container
+{
+	margin: 0.8em auto 0.5em auto;
+	clear: both;
+	background-color: #efefef;
+}
+
+div.featured-links
+{
+	padding: 0.6em;
+}
+
+ul.featured-links
+{
+	background-color: #efefef;
+	padding-top: 0.6em;
+	list-style-type: none;
+	padding: 0;
+	margin: 0px;
+	font-size: 0.9em;
+	display: inline;
+
+}
+
+li.featured-links
+{
+	display: inline;
+	text-align: center;
+	margin: 0em 0.2em 0em 0.5em;
+}
+
+
+
+a.featured-links
+{
+	color: #5C6E58;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+a.featured-links:hover
+{
+	color: #5C6E58;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+span.featured-link-explanation
+{
+	color: #5C6E58;
+}
+
+div.feature-caption
+{
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;	
+	padding: 0.5em;
+	font-style: italic;
+	font-weight: bold;
+	font-size: 0.9em;
+}
+
+h4.featured-links
+{
+	color: #1C2E18;
+	float: left;
+	font-size: 0.9em;
+	margin: 0 0.5em 0 0;
+}

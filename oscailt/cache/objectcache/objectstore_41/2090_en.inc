@@ -1,0 +1,12 @@
+<?php $oscailt_page_setting = Array("site_module_settings" => Array("siteobject" => "1", "newswireobject" => "50", "articleobject" => "53", "featureobject" => "54", "galleryobject" => "64", "searchobject" => "41", "archiveobject" => "55", "contactobject" => "84", "commentsobject" => "56", "publishobject" => "57", "eventsobject" => "58"), "site_mail_settings" => Array("to" => "", "from" => "", "subject_prefix" => "", "replyto" => "", "level" => "high"), "site_filters" => Array("topic" => Array("0" => "*"), "region" => Array("0" => "*"), "language" => Array("0" => "*"), "type" => Array("0" => "*"), "author" => ""), "obj_id" => "2090", "obj_type" => "FEEDEXPORT", "site_id" => "1", "page_filters" => Array("topic" => Array("0" => "*"), "region" => Array("0" => "*"), "language" => Array("0" => "*"), "type" => Array("0" => "*"), "author" => Array("0" => "")));
+require_once "objects/indyruntime/feedexportdisplay.inc";
+
+         $site_module = new feedExportDisplay(2090);
+         $site_module->setFilters(Array("*"), Array("*"), Array("*"), Array("*"), Array(""));
+         $object_display_settings = (Array("siteobject" => "1", "newswireobject" => "50", "articleobject" => "53", "featureobject" => "54", "galleryobject" => "64", "searchobject" => "41", "archiveobject" => "55", "contactobject" => "84", "commentsobject" => "56", "publishobject" => "57", "eventsobject" => "58"));
+         $site_module->setSiteSettings($object_display_settings);
+      $site_module->setAdminOptions(Array("feedlogo" => "", "feedicon" => "", "feedtitle" => "", "feeddescription" => "All the latest news posted to Indymedia Ireland\'s open publishing newswire. Indymedia Ireland is a collectively run media outlet for the creation of radical, accurate, and passionate tellings of the truth, offering grassroots, non-corporate coverage of Irish news and events.", "feedlicence" => "", "feedlength" => "20", "feedsummarylength" => "150", "filetypes" => "", "feeddepth" => "content", "feedformat" => "HTML", "itunestags" => "disabled", "itunescategory" => "", "itunessubcategory" => "", "itunesauthor" => "", "itunesownername" => "", "itunesowneremail" => "", "itunessummary" => "", "itunessubtitle" => "", "ituneskeywords" => "", "itunesimage" => "", "itunesexplicit" => "no", "itunesblock" => "no", "filecentric" => "false", "parsecontent" => "false"));
+$site_module->setUserOptions(Array("feedtype" => "Atom", "feedversion" => "1.0"));
+
+         $site_module->processRequest();
+       ?>

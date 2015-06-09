@@ -1,0 +1,156 @@
+-------- Installing Oscailt version 3.5 on Mon 10 Nov 11:38:11 -------- 
+Server has Apache/2.2.29 (Unix) mod_ssl/2.2.29 OpenSSL/1.0.1e-fips mod_bwlimited/1.4 webserver running CGI protocol HTTP/1.1
+Server Operating System is Linux
+Server has version PHP 5.4.34 installed.
+PHP extension GD (graphics library) installed.
+PHP extension mbstring (multibyte strings) is NOT installed.
+PHP extension shmem (Shared Memory) is NOT installed.
+PHP extension sysvsem (Semaphores) is NOT installed.
+End of stage 1 reached.
+Checking required paths and files.
+Checking path attachments/... path does not exist
+Path attachments/ created.
+Checking path attachments//xspf_player/... path does not exist
+Path attachments//xspf_player/ created.
+Checking path cache/... path does not exist
+Path cache/ created.
+Checking path logs/... path does not exist
+Path logs/ created.
+Checking path cache/imagecache... path does not exist
+Path cache/imagecache created.
+Checking path cache/imagecache/video_images/... path does not exist
+Path cache/imagecache/video_images/ created.
+Checking path attachments/sites/... path does not exist
+Path attachments/sites/ created.
+Checking path cache/querycache/... path does not exist
+Path cache/querycache/ created.
+Path cache/querycache/1/ created.
+Path cache/querycache/2/ created.
+Path cache/querycache/3/ created.
+Path cache/querycache/4/ created.
+Path cache/querycache/5/ created.
+Checking path cache/objectcache/... path does not exist
+Path cache/objectcache/ created.
+Checking path cache/rsscache/... path does not exist
+Path cache/rsscache/ created.
+Checking path attachments/sites/default/... path does not exist
+Path attachments/sites/default/ created.
+Checking path cache/objectnamecache/... path does not exist
+Path cache/objectnamecache/ created.
+Checking path cache/typedetailscache/... path does not exist
+Path cache/typedetailscache/ created.
+Checking path xmldata/templates/... path exists and is writeable.
+Checking path xmldata/exports/... path does not exist
+Path xmldata/exports/ created.
+Creating Directories and Checking Permissions Complete.
+Error connecting to database. Schema test_db on host localhost appears to be missing.
+End of stage 2 reached.
+-------- Installing Oscailt version 3.5 on Mon 10 Nov 11:39:50 -------- 
+Server has Apache/2.2.29 (Unix) mod_ssl/2.2.29 OpenSSL/1.0.1e-fips mod_bwlimited/1.4 webserver running CGI protocol HTTP/1.1
+Server Operating System is Linux
+Server has version PHP 5.4.34 installed.
+PHP extension GD (graphics library) installed.
+PHP extension mbstring (multibyte strings) is NOT installed.
+PHP extension shmem (Shared Memory) is NOT installed.
+PHP extension sysvsem (Semaphores) is NOT installed.
+End of stage 1 reached.
+Checking required paths and files.
+Checking path attachments/... path exists and is writeable.
+Checking path attachments//xspf_player/... path exists and is writeable.
+Checking path cache/... path exists and is writeable.
+Checking path logs/... path exists and is writeable.
+Checking path cache/imagecache... path exists and is writeable.
+Checking path cache/imagecache/video_images/... path exists and is writeable.
+Checking path attachments/sites/... path exists and is writeable.
+Checking path cache/querycache/... path exists and is writeable.
+Checking path cache/objectcache/... path exists and is writeable.
+Checking path cache/rsscache/... path exists and is writeable.
+Checking path attachments/sites/default/... path exists and is writeable.
+Checking path cache/objectnamecache/... path exists and is writeable.
+Checking path cache/typedetailscache/... path exists and is writeable.
+Checking path xmldata/templates/... path exists and is writeable.
+Checking path xmldata/exports/... path exists and is writeable.
+Creating Directories and Checking Permissions Complete.
+Server has MySQL database version 5.5.37-cll installed.
+Empty installed database detected with database name imemc_oscailt connected via user imemc_db to host localhost
+End of stage 2 reached.
+Importing database records.... connecting to database.
+Database Installation <li class='install-result'>adding topics table<li class='install-result'>adding regions table<li class='install-result'>adding types table<li class='install-result'>adding languages table<li class='install-result'>adding stories table<li class='install-result'>adding comments table<li class='install-result'>adding attachments table<li class='install-result'>adding votes table<li class='install-result'>adding voted table<li class='install-result'>adding editorial actions table<li class='install-result'>adding translations table<li class='install-result'>adding import feeds status table<li class='install-result'>adding editors table<li class='install-result'>adding configuration table<li class='install-result'>adding editors' roles table<li class='install-result'>adding role table<li class='install-result'>adding role permissions table<li class='install-result'>adding master data object table<li class='install-result'>adding data objects table<li class='install-result'>adding edit lock table<li class='install-result'>adding banned IP table<li class='install-result'>adding banned author table<li class='install-result'>adding banned sub-host table<li class='install-result'>adding feed_rules table<li class='install-result'>Installing initial Language (english)<li class='install-result'>Installing initial article types<li class='install-result'>Installing initial Topic (miscellaneous)<li class='install-result'>Installing initial Regions (national and international)<li class='install-result'>Installing initial admin editor (admin/admin)<li class='install-result'>Installing initial administrative role (Total Control Role)<li class='install-result'>Granting administrative role to admin user<li class='install-result'>Installing initial editorial role (Full Editorial Role)<li class='install-result'>Granting editorial role for site 1 to admin user<li class='install-result'>Successfully installed starter data</li> Database Installation OK
+Writing Data Object Choices from xmldata/indydatatypes/
+End of stage 3 reached.
+Writing Data Object Choices from xmldata/indydatatypes/
+End of stage 3 reached.
+Import of initial data objects from xmldata/indydatatypes/
+Reading choices from collection for collection choice Basic IMC
+front page object id set to: 54
+clearing sql cache.
+End of stage 4 reached.
+Creating object caches.
+Building object cache files for object id 1
+Building object cache files for object id 4
+Building object cache files for object id 2035
+Building object cache files for object id 1980
+Building object cache files for object id 2034
+Building object cache files for object id 1975
+Building object cache files for object id 2038
+Building object cache files for object id 27
+Building object cache files for object id 2042
+Building object cache files for object id 39
+Building object cache files for object id 40
+Building object cache files for object id 41
+Building object cache files for object id 42
+Building object cache files for object id 2041
+Building object cache files for object id 44
+Building object cache files for object id 45
+Building object cache files for object id 46
+Building object cache files for object id 47
+Building object cache files for object id 50
+Building object cache files for object id 53
+Building object cache files for object id 54
+Building object cache files for object id 55
+Building object cache files for object id 2032
+Building object cache files for object id 24
+Building object cache files for object id 56
+Building object cache files for object id 57
+Building object cache files for object id 58
+Building object cache files for object id 59
+Building object cache files for object id 60
+Building object cache files for object id 1928
+Building object cache files for object id 64
+Building object cache files for object id 68
+Building object cache files for object id 67
+Building object cache files for object id 1931
+Building object cache files for object id 1932
+Building object cache files for object id 1972
+Building object cache files for object id 76
+Building object cache files for object id 80
+Building object cache files for object id 84
+Building object cache files for object id 1867
+Building object cache files for object id 1868
+Building object cache files for object id 2036
+Building object cache files for object id 2037
+Building object cache files for object id 1924
+Building object cache files for object id 2031
+Building object cache files for object id 2090
+Building object cache files for object id 2093
+Building object cache files for object id 2096
+Building object cache files for object id 2097
+Building object cache files for object id 2098
+Building object cache files for object id 2099
+Building object cache files for object id 2100
+Building object cache files for object id 2101
+Building object cache files for object id 2102
+Building object cache files for object id 2103
+Building object cache files for object id 2104
+Building object cache files for object id 2105
+Building object cache files for object id 2106
+Building object cache files for object id 2107
+Building object cache files for object id 2108
+Building object cache files for object id 2109
+Building object cache files for object id 2113
+Building object cache files for object id 2116
+Building object cache files for object id 2117
+Cached object names.
+Cached type details.
+Installation complete.
+--------------------------------------------

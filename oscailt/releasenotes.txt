@@ -1,0 +1,381 @@
+This file documents the significant changes made in each release 
+
+Version 3.5 - Released Nov 2011 
+- Added ability to translate topics, regions and types into all defined site languages.
+- Added feature to enable automatic scheduled publishing/unhiding of features. 
+- Added new pending state in addition to hidden state for stories and comments.
+- Added further updates to allow translation of most of remaining editor screens.
+- Added feature to generate a scrollable list of preloaded images in gallery banner mode using javascript.
+- Added basic javascript image slide show for a photo essay mode to article module triggered by photo-essay story type.
+- Added support to integrate basic usage modes of the OpenWYSIWYG and TinyMCE WYSISYG HTML editors into publish form.
+- Added option in publish for stories and comments for users to opt not to display their email address to the public.
+- Added feature to allow public to edit stories based on session or password for up to a configurable amount of time.
+- Update to allow audio to be featurized and add headline mode in gallery for audios. 
+- Update to configure dashboard mode to default or not. 
+- Update to fix msgbox for embedded videos.
+- Update to extend Oscailt IMAGEMACRO to allow (self) referencing of story images by number -e.g image1
+- Update to extend options for automatically emailing story contents and or comments to editors when published.
+- Update to correctly handle preferences, language and comments settings in html caching.
+- Update to Debug Articles screen to search database for stories with invalid values for either topics, regions or types.
+- Update to admin stats to display by default MySQL server statistics derived from SHOW STATUS and SHOW VARIABLES.
+- Update to retrive cover images for embedded Vimeo and Politube videos.
+- Update to IMC citylist object to filter out a comma separated list of dead IMC sites.
+- Update to improve configuration around embedded videos auto-hiding and cover images.
+- Update to improve multi filtering options in the view editorial logs screen.
+- Update to functionality for listing hidden stories and comments to public to allow display of hidden comments and other options
+- Update to clip, unclip move and release editing options to display consistently and correctly.
+- update to optionally display story translated links in the newswire.
+- Minor update to admin stats to display statistics on the number of different file types in miscellaneous attachments.
+- Minor update to events objects to add more labels that are configurable and can be translated.
+- Minor update for events to configu whether to display 12 or 24 hr clock mode for event time in article display.
+- Minor update to separate out most of the javascript in the publish module into a separate js file to allow caching.
+- Minor update to add search and replace for form text using javascript for editors in the Scratch Pad screen.
+- Minor update to view objects to display some more details when filter used. 
+- Minor update in view articles admin page to select listing by attachment type.
+- Minor update to display story hide reason when viewing hidden story in articledisplay.
+- Minor update to add parent story id to log message when failure to read embedded video cover images.
+- Minor update to configuration to display susohin (hardened PHP) settings if installed and do validation checks.
+- Minor update to add viewing mode to style sheets admin page. 
+- Minor update to import screen to select or deselect all objects with one tickbox.
+- Minor update to allow story promote from within article viewing page.
+- Minor update to add newswire mode for use by editors to generate feature/story links for pasting to features.
+- Minor update to use large and small icons for miscellanous attachments.
+- Minor update to numeric captcha to improve coding.
+- Minor update to stealth mode during admin login where minimum information is displayed at login and just after.
+- Minor update to use different style class for hidden stories to allow them to have a different background colour.
+- Minor update to extend publish module to allow preview of features as displayed in feature newswire.
+- Minor update to allow editors publishing new stories that are not features to set whether visible, pending or hidden.
+- Minor update to replace calls from PHP function split to preg_split and other changes for other deprecated PHP functions.
+- Minor update to preseve aspect ratio in image resizing. This partially existed already.
+- Minor update to display parent story title in comment hide email notifications.
+- Fixed problem where page jumped back to top when clicking embedded cover images or notice to embedded HTML
+- Fixed bug to allow move attachment to comment which moves to first comment in the clipboard.
+- Fixed bug in print mode where HTML HEAD was appearing at end of page and causing printing problems.
+- Fixed bug in the import module where imported language was not saved to database.
+- Fixed bug in the implementation of sub-host bans.
+- Fixed bug in the display of statistics for number of comments published in previous day and two days.
+- Minor bugfix to ban options array leading to incorrect ban times.
+- Minor bugfix to Clear Imagecache functionality which was deleting video_images directory.
+- Minor bugfix to attachment description edit where a single quote truncated text.
+- Minor bugfix to display of highlighted search words in returned text.
+- Minor bugfix to fix incorrect timestamp display to account for timezone offset in editmonitor.
+- Minor bugfix to fix incorrect month setting in inset module layout.
+- Minor bugfix to correct potential problem with story type id check to configured feature id in publish form.  
+
+Version 3.4 - Released Aug 2010 
+- Added audio, video and file attachments modes to gallery display. 
+- Added functionality for editors to add one line annotations to stories and comments that are visible to editors only.  
+- Added ability to translate approximately 50% of the main admin pages using XML files. Later releases to complete.
+- Added ban by hostname and browser with option to alternatively moderate.
+- Added default option to control whether to hide by default or not embedded videos. Also added exclusion list.
+- Added mechanism to examine entries in translation table.
+- Added search word highlighting in newswire and article pages returned from searches.
+- Added spam word filter module for use by publish with options for spam detection in stories and comments. All configurable.
+- Added feature to retrieve cover images for YouTube videos and cache them.
+- Added basic html cache for use by main pages including clear html cache option.
+- Added basic dashboard of summary information to the admin page.
+- Added facility to send emails when a new story is published to editors that select to receive them.
+- Updated numeric captcha for languages, form validation and further publish validations.
+- Updated publish form to allow story summary and body and comment title and body to be converted to lowercase with a capital letter at the start of each sentence, by editors.
+- Updated view objects to display list of templates and create template directory if it is not present.
+- Updated imported feeds status to allow pre-parsing stream fixup rules to be created so that faulty feeds can be read.
+- Update to inset objects to display depending on date and time. Useful for automatic switch on and off.
+- Minor update to editimage.php to add a compact display mode.
+- Minor update to highlight events that have been voted upon using promote option.
+- Minor update to reset retry counter for a given RSS or Atom feed in RSS management page. Also shows the cache filename.
+- Minor update to add editorial roles during full install.
+- Minor update to search algorithm and add basic validations
+- Minor update to 'Add Bookmark' feature to preferences box.
+- Minor update to publish form to validate video ids. 
+- Minor update to clear cache to create option to create embedded video cover image cache directory.
+- Minor update to attachments to report more error conditions on file uploads.
+- Minor update to display text based graph of number of comments per hour in admin stats page for current day.
+- Minor update to allow story publishing to be switched off globally from main configuration screen.
+- Minor update to add basic scratch pad facility into the Oscailt messaging screen.
+- Minor update to add option to tick all selections in the admin export data screen.  
+- Minor update to add auditing to changes in comment publish delay configuration.  
+- Minor update to file uploads in modules admin screen to display file sizes. 
+- Minor update to add keywords.inc file for translation of common keywords. 
+- Fixed faulty display of hidden embedded video mode
+- Fixed translation bug with features.
+- Fixed install bug with content_translation table with incorrectly named primary key.
+- Fixed bug where publish form preview in module layout returns request cancelled.
+- Fixed potential security bug with URL parsing.
+- Fixed bug with switch-on time of shared memory. 
+- Fixed bug in full install where call to query object function failed.
+- Fixed bug in bargraph generation when calculating position of title within image.  
+- Minor bug fix in attachment list display in stats.php
+- Minor bug fix in publish form where embedded video and audio ids were not displayed.
+- Minor bug fix in JS feeds to remove linefeeds and a fix to the content type returned.
+- Minor bug fix to display image manager link for editors to first photo in a story
+- Minor bug fix to not send out embedded video or audio in RSS or Atom feeds
+- Minor bug fix in the swap image function with timeposted field where sometimes operation failed.
+- Minor bug fix to remove embedded video during edit when deselected.
+
+Version 3.3 - Released April 2009 
+- Added new database table to store editorial actions and updated view site logs screen to display and filter this informaton.
+- Added new feature for editors to link translated stories together using a new translation table.
+- Added new feature using shared memory to track page hits for different modules and samples memory usage. Counts viewable and memory usage graphed in View Stats page.
+- Added new feature using shared memory to determine most popular story. Viewable to editors only for this release.
+- Added new administration image management module to view images and rotate them if required and identify correct image type. It provides other info about an image too, e.g links to story or comment.
+- Added new functonality to optionally display embedded video as a link to avoid IP tracking by video provider. 
+- Added new functionality to generate links for social bookmarkng the top 5 social bookmark sites for article pages.
+- Added new fundraising bargraph code ideally used from an Oscailt code box object.
+- Added extra spam bot control with full site blocking and publish page blocking options.
+- Added Shared Memory configuration and activation to administration edit configuration screen.
+- Update to newswire and article module to display story or comment hide reason when logged in, read from the new editorial action table.
+- Added new functionality to publish module to allow story edits by public with optional password to a small set of stories.
+- Added new functionality to allow editors to do basic voting on stories and to generate a newswire of voted stories.
+- Added new functionality to track the status of imported RSS and Atom feeds viewable in a new administration page.
+- Added back pre Oscailt 3.0 functionality to allow Javascript non-standard site feeds.
+- Added goto article button generation function for use by codebox objects allowing an easy jump to an article page.
+- Update to publish form to accept description captions for embedded video and embedded audio.
+- Update to publish form with extra spam detection code.
+- Update to IP monitor to do a hostname lookup, show browser info and show story and comment ids.
+- Update to edit roles administration screen to display list of editor names with each named role. 
+- Update to image tool class to check sufficent server memory before generating thumbnail images.
+- Update to database cache to use separate cache directories for each cache group.
+- Update to object viewer to generate links to lists of objects by type and display more info per object type
+- Update to imported RSS feeds to output errors to logfile if PHP error_display off and to save faulty RSS feeds in a file that are viewable in View Logs screen.
+- Minor update to add option to convert RSS feeds from UTF-8 before parsing stage to ISO-8859-1
+- Minor update to add option to convert IMC site listing stream from UTF-8 to ISO-8859-1
+- Minor update to edit configuration screen to add warnings for invalid PHP file upload sizes and attachment limits.
+- Minor update to edit configuration screen for system info to display list of PHP extension functions and magpie settings
+- Minor update to search module to improve ability to search with multiple words.
+- Minor update to code so that Edit Content mode works for static documents allowing links to editing the object.
+- Minor update to Oscailt message screen to allow sorting of last login times in View Editor Profiles tab.
+- Minor update to friendly urls page to allow sorting of display by object type
+- Minor update to edit editors page to allow sorting of display by editor name
+- Minor update to edit roles page to allow sorting of display by role type
+- Minor update to edit topics and edit regions pages to allow sorting of display by name
+- Minor update to publish to report list of image attachments uploaded
+- Minor update to publish to add MAX_FILE_SIZE in hidden form data for file upload to allow better error feedback.
+- Minor update to statistics page to correct report counts for embedded video and audio attachments
+- Minor update to latest comments to report number of pending or queued comments when comment delay enabled
+- Minor update to newswire module to give option to allow audio player to be displayed in summary area.
+- Minor update to view site logs admin screen to increased the display page size.
+- Minor update to clear cache screen to control which database caches to clear 
+- Minor update to clear cache screen to check existence of database cache directories and indicate cache mode.
+- Minor update to improve diagnostics in install script.
+- Minor update to add home page and logout link to all administration pages.
+- Minor update to display comment ids beside comment title when logged in.
+- Minor update to add audit logging to create, updates and delete of roles.
+- Minor update to stylesheets edit screen to report sites using default style sheet files and display file info.
+- Minor update to site upload site files screen to display directory path.
+- Bugfix to bulk delete for logging and for timezone offset and report correct totals for comments and attachments in hidden stories.
+- Minor bugfix to allow hypen '-' in first and second part of a story related link URL.
+- Minor bugfix where event time kept reverting to a default of selected-hour and 59 minutes.
+- Minor bugfix to update the maximum form field size for 'related link' in publish form.
+- Minor bugfix to the numeric captcha in publish of images.
+- Minor bugfix to friendly url administration screen for document object redirects introduced in 3.2
+- Minor bugfix to update incorrect field sizes in the search.xml file for translated fields.
+
+Version 3.2 - Released July 2008 
+- Added ability to publish multiple embedded video and audio and option to display embedded video in newswire summary
+- Added ability to specify event time during event publishing.
+- Added ability to make date texts used by events and archives to be more easily translated.
+- Added more text labels to allow more of events screen to be translated for multi language support.
+- Added more text labels to allow advanced search screen to be translated for multi language support.
+- Added support embedded video from Politube.org to existing list.
+- Added Webserver, MySQL and PHP installation information to administration edit configuration screen.
+- Added daily email generation of mappings to hidden story and comment ids to their titles.
+- Added basic feature to generate static page listing most recent story and comment hides. Shows ids, titles and reasons.
+- Added install log to full installation script and some additional checks.
+- Added some extra site debug info overall, including object ids now in HTML source code as HTML comments.
+- Added ability for a second level of directory entries in friendly URLs for document objects.
+- Added audit logging for create, update and deletes for topics, types, regions and languages.
+- Added text based numeric captcha for use by publish form for anti spam measures.
+- Added Oscailt message reminder system which can schedule when to put messages on the Oscailt message system.
+- Updated View Objects screen with more functionality about page references and objects in other languages.
+- Updated Oscailt message screen to display list of editorial locks on stories and comments.
+- Minor update to indypage to allow page contents to appear before page insets. Useful for front page design.
+- Minor update to statistics page to use style sheets classes in all parts of the display.
+- Minor update to editors admin screen to page if more than 25 editors. 
+- Minor update to import to record imports in editorial log.
+- Major bugfix in indyobjectset where ISO-8859-1 character set is now used during XML parser. This affected translated versions of static pages and other objects, by corrupting some characters.
+- Major bugfix for sessions lost by declaring class before usage in redirect.inc. Affected only PHP 4.x. Similiar preventive fix to roles.inc
+- Bugfix to send email ban notification when banning is done from IP monitor screen.
+- Bugfix to magpie parser code for Windows to not call the is_executable function first as this caused code to exit.
+- Minor bugfix for publish form for length of related link.
+- Minor bugfix to events display for monthly mode and when displaying past events.
+- Minor bugfix to user levels for warning and message.
+- Minor bugfix to to header so that HTML title tag appears after meta data with character set setting.
+- Minor bugfix so that if user error reporting is set in file, it is not overwritten by database value.
+
+Version 3.1 - Released February 2008 
+- Improved database caching. It is now divided up into 5 groups to help reduce destroying it all on updates.
+- Modified a relatively large number of links with "rel=nofollow" to tell googlebot not to follow them.
+- Added ability to sort by IP and show relative timestamps in IP monitor and added highlighting.
+- Added javascript option for editors in publish form in edit mode for 'Title Decapitalization' which means it
+  converts the title text to lower case and uppercases all first letters of each word.
+- Added a new screen to display recent editor/user status and enable the sending of simple messages between editors. It also includes notification of a pending message to read at the top of the page to editors.
+- Added basic spam logging and anti-spam measures for long URI requests and tracking failed logins. The lengths are
+  configurable. 
+- Added quite extensive range of anti-spam measures in contact module/form and logging of suspected spam in a formatted way. Some of these the spam measures are configurable through module layout.
+- Added eventDate field for events in RSS feeds. Currently it is hard coded to check type_id = 5. Not ideal.
+- Added new admin screen for displaying basic object info. Enables filter by object, type etc. 
+- Updated article display to filesizes in Mb for audio and misc files and added bigger audio and video icons.
+- Updated code so that hidden comments display in different background color and hidden totals are now given at top and bottom of page for editors. Requires update of style sheets for site specific colors.
+- Added slighly improved transparency for banned IPs, by auto-filling in the reason with the end ban date and editor and auto generating and sending and email notification. Table also updated for begin ban datetime.
+- Added anchor link to 'Todays' events in monthly event listing. 
+- Added auto hiding of past events for monthly mode in calendar display. They can be turned on again.
+- Added the parent story title to Reported Posts functionality for comments. URL also added as a hidden form element.
+- Added ability to log reported posts and new display mode for them in view logs.
+- Added some improvements to View Logs display and added views of spam, reported posts and spam-email log files.
+- Added user optional extra javascript validation for publish when uploading files to help avoid validation failures after uploading. Useful for dialup.
+- Added editor ability to swap the displayed order of images separately in stories or comments.
+- Updated statistics to generate figures for previous selectable months and the last 7 days.
+- Updated and fixed bug in Bulk Delete. Added additional selectable times to delete back from. It also generates an entry to the action log with the count separately for number of hidden stories, comments and attachments deleted.
+- Added some additional logging for failed publishes of file uploads to help futher debug problems in this area.
+- Added code to record to editorial (action) log editor creates, deletes and updates by other editors.
+- Added feature when editing own profile to view the Oscailt permissions. Easier than figuring out by roles.
+- Fixed bug in user preferences display. This was preventing modificaitons being saved to user preference module.
+- Updated user preference module definition to allow option to display User Status link.
+- Added ability to publish stories and comments with embedded video. About 15 different types can be handled.
+- Added last_login and editor_details to editor table to enable last logins to be tracked and extra data stored like additional contact info.
+- Added Bristol IMC feature to view full comment text of comments in latest comments page. Currently only vieweable by editors. Same change includes updates to user preferences to control this.
+- Added Bristol IMC feature to add a configurable publish delay for comments. This effects story and latest comments modules.
+- Added Bristol IMC feature to add ability to ban publish with a given author name.
+
+
+Version 3.0.3
+- Everything works properly now with PHP5
+- some small bugs fixed here and there
+- various SQL optimisations
+
+Version 3.0.2
+- Fixed bug with checking of stylesheet extension
+- Added anti-spam checkbox to contact forms
+
+Version 3.0.1
+- Fixed a bug with the default feed logo pointing to a non-existant jpeg file
+
+Version 3.0
+- Added a whole new module system and tonnes of other good stuff too numerous to mention 
+
+Version 2.04
+- Fixed bug in rsswirebar in selecting channel link which isn't global rss, if its in the format *.indymedia.org
+- Changed default value of oml listing to new value
+- Fixed bug in feature reset time function, which caused it not to work
+- Changed Feature thumbnail to point to article rather than image within article
+- Fixed typo preventing video icon link from showing on sidebar
+- Changed category exclusions so they only apply on newswire default view, or filter searches. Text or date searches from sidebar, search page and archive no longer use excludes.
+- Fixed bug in gallery which was displaying images even though they were contained in hidden comments
+
+Version 2.03
+- Added scanning tool for editors to detect and fix link errors in html content. 
+- Added config item to enable/disable OML listing in page footer
+- Fixed html publishing and time posted altering permission issues in editor interface.
+- Extended searching to now search attachment descriptions.
+- Added gallery search option to advance search and quick search.
+- Added gallery mode to archives page.
+- Added image gallery and related database changes.
+- Added exclusion functionality to categories to enable other press section to be created.
+- Added thumbnail engine to allows thumbnails to be shown on newswire and to replace client side scaling of of existing newswire bar thumbnail.
+- Switched RSS feeds to UTF-8 encoding.
+- Fixed editor read permissions bug in bulk delete.
+- Fixed problems with global rss wire date format parsing.
+- Added feature to allow various data caches to be cleared by editors.
+
+Version 2.02
+- Updated archives page to show only one calendar year at a time. Also added feature to select the newswire
+for any given week in the past.
+- Added events listing to the sidebar.
+- Fixed some bugs in the event calendar weekly mode display for leap year and end year rollover.
+- Fixed bug in the event calendar monthly mode display to correctly check the date and apply colours. Style sheet updated
+with colours too.
+- Fixed bug that prevented events being added for 'today'.
+- Fixed bug that sometimes resulted in same month being listed twice in the month drop-down list in publish events.
+- Fixed Db upgrade utility files so as to access objects/objectlayer.inc file correctly.
+- Fixed SQL syntax error in the install database script.
+- Fixed bug causing potential sql security issue.
+- Fixed bug in .htaccess file that accidently commented out vital directives
+- Fixed bug in latestcomments.php that had db name hardcoded.
+- Stylesheet updated with style style for front page notice
+- Updated Oscailt design notes, install guide and FAQ.
+
+Version 2.01
+- Added fix to uploaded file permissions to allow manual backups.
+- Added feature to allow custom icons for miscellaneous file types. Included icons for .pdf and .doc files, can be extended by editing attachment.inc
+
+Version 2.0
+- Added php configuration overrides to .htaccess file to force magicquotes to off and prevent transparent display of session id's.
+- Added stylesheet filter to allow dynamic resizing of a pages text size based on users cookie preference
+- Renamed include files to .inc extension rather than .php to prevent malicious execution.
+- Switched default query values to be alphabetic eg(region=dublin rather than region_id=4), old ones still work though.
+- Added fix for statistic and bulk delete time based queries round to nearest 12 am to prevent unique time for each query bypassing cache.
+- Added reply to field in email config to allow different reply address for emails
+- Added fix to prevent escape slashes appearing in auto notifications.
+- Added fix for bug in saving boolean values in configuration
+- Added hidden comments to editor view of lastest comments
+- Added code to fetch and parse OML listings from the global IMC contact database (every 24 hours) to keep IMC network list up to date.
+- Integrated Magpie RSS code better with main codebase and changed it to use querycache
+- Rejigged query cache to provide generic caching of any data not just sql.
+- Added atomic file locking to query cache creation to prevent file corruption.
+- Added autohealing to querycache allowing it to clean out cached database query failures.
+- Added ability to default to specific language filter based on HTTP request language preferences.
+- Added automatically generated headlines display box on frontpage. Headlines specific to topic or region selected.
+- Added ability to load different banner graphics and stylesheets based on topic and region filters
+- Overhauled interface with new layout allowing easier customisation using stylesheets
+- Added fix for bug preventing moving/copying of attachments with quotes in description
+- Added fix for bug causing problems with pasting links of certain comments from clipboard
+
+Version 1.05
+- Added mechanism for publishing new story type "event notices" with time of event
+- Added event calendar for viewing events.
+- Modified default newswire and newsfeed view to not display events.
+- Added extra option to type filter in newswire, newsfeed and search allowing default eclusion of events to be overridden
+- Added upcoming events box to front page
+- Renamed newswire calendar to "archives" to prevent confusion with new event calendar
+- Added mechanism "under the hood" to have negative filter ie topic_id=-4 shows all stories except those with topic 4. Will need to be improved and has no UI yet
+- Added mechanism to allow editors to publish using inactive categories
+- Added more display options to latest comments page
+
+Version 1.04
+- Added new config settings to force email notifications (with configurable exception for features)
+- Added auto notification of edit actions on stories and comments
+- Added ability to select feature images, displayed as thumbnail on front page at top of newswire box
+- Added front page notice to config allowing temporary notices to be put on front page.
+- Added text area display function to config page
+- Fixed bug in config page failing when quotes used
+- Added new story category of language
+- Removed all references to IMC Ireland in the code and replaced with link to site identification variables
+- Added new design documentation
+- Added description for attachments, and changed images to be centred in page
+- Added ordering preferences to coment display and mechanism to persist comment dispay preferences in cookie
+
+Version 1.03
+- Added story categories display on neswire summary display
+- Added comment navigation links and condensed comment display mode
+- Added "open publishing control" feature which allows stories and comments to be auto hidden upon publication
+- Removed media type and size restrictions when in editor mode.
+- Added "printable version" display mode on story pages
+- Fixed navigation bug on front page that was causing newswire sidebar to use query offset of centre column.
+- Added newswire calendar and navigation links for easily traversing the newswire and feature archives
+- Fixed bug in preview feature that was overwriting summary with content.
+- Fixed reliance on "register globals" in storydisplay.php in its use of php_self variable
+
+Version 1.02
+- Added preview feature for story and comments publishing (disabled for uploads and while in editor mode)
+- Fixed incorrect spacer image tag in filterbar causing 404 errors in logs
+- Changed html title on story pages to include story title.
+- Fixed bug in comment copying which wasn't copying any comment attachments
+- Changed "upgrade to feature" functionality to create a temporary story for editing which is later merged with original, rather than hiding original story.
+- Fixed rogue table element possibly causing display problem on older browsers
+- Fixed problem with certain urls in automatic mail notifications
+- Fixed problem with images in feature summaries pushing down into next summary
+
+Version 1.01
+- Removed IMC List from sidebar except on index and newswire summary page
+- Added global newswire column to newswire using Magpie RSS Parser.
+- Changed RSS Channel Title calculation to better suit Global Indymedia newsfeed.
+- Changed RSS item creator to short version of site name.
+- Changed RSS "feedtype" parameter to "depth" in line with standard usage. Defaults to "summary depth".
+- Added RSS "content_type" parameter to allow choice of html or plain text in newsfeeds. Defaults to plain text.
+- Fixed duplicate icon error in Javascript newsfeed for stories containing images.
+- Added notice to publish pages, asking use to use contact form for editorial queries/requests
+- Added feature to publish page to automatically prepend http:// to "related link" field if no URL prefix is present.
+- Reformatted layout of advanced search page and url generator page.
+
+Version 1.0
+- First version so no notes yet really, future releases will contain notes on all new features.

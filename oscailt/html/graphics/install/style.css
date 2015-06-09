@@ -1,0 +1,103 @@
+TABLE.admin{
+	MARGIN: 0;
+	WIDTH: 100%;
+	PADDING: 0px;
+}
+
+TR.admin{
+	BACKGROUND-COLOR: #E8F6E8;
+        height: 100%;
+}
+
+TD.admin{
+	MARGIN: 0px;
+	padding: 6px;
+        vertical-align: top;
+        height: 100%;
+}
+
+TH.admin{
+	COLOR: #fff;
+	BACKGROUND-COLOR: #87B087;
+	MARGIN: 0px;
+	BORDER: 0px;
+	padding: 3px 0 2px 0;
+}
+
+h4.object-name-list
+{
+	color:	#69796C;
+	margin-top: 4px;
+	margin-bottom: 6px;
+	background-color: #fff;
+}
+
+ol.install-requirement
+{
+	background-color: #E8F6F6;
+	border:  #FFB697 1px solid;
+	margin: 0 20px 20px 20px;
+	padding: 0 2em 1em 2em;
+}
+
+ul.install-result
+{
+	background-color: #E8F6F6;
+	border:  #FFB697 1px solid;
+	margin: 0 20px 20px 20px;
+	padding: 1em 2em 1em 2em;
+}
+
+li.install-result
+{
+	font-family: monospace; arial;
+	font-size: 0.9em;
+}
+
+li.install-error
+{
+	font-family: monospace; arial;
+	color: #822;
+	font-size: 0.9em;
+}
+
+
+h3.install-requirement
+{
+	background-color: #E8F6E8;
+}
+
+h2.install-header
+{
+	margin: 0 0 0 0;
+	padding: 1em 0 1em 0;
+	color:	#69796C;
+	background-color: #fff;
+}
+
+li.install-requirement
+{
+	margin-top: 1em;
+}
+
+div.install-page
+{
+	border: #69796C 2px solid;
+	background-color: #E8F6E8;
+	padding: 0.1em;
+	margin: -2px 0 0 0;
+	
+}
+
+div.install-logo
+{
+	border: #69796C 2px solid;
+	padding: 1em 0 1em 0;
+	text-align: center;
+}
+
+div.install-body
+{
+	padding: 1em;	
+}
+

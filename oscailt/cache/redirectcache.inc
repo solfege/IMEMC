@@ -1,0 +1,33 @@
+<?php 
+$redirects[] = new FilteredRedirector(1980, Array("0" => "imcfeatures"));
+$redirects[] = new FeedRedirector(1975, Array("0" => "rsssummaries", "1" => "rsssummaries.xml", "2" => "rsssummaries2.0", "3" => "rsssummaries2.0.xml", "4" => "rss", "5" => "rss.xml", "6" => "rss2.0.xml", "7" => "rss2.0", "8" => "export.xml", "9" => "feed.php", "10" => "newsfeed.php"));
+$redirects[] = new Redirector(2038, Array("0" => "editorial", "1" => "editorial.php", "2" => "editorial_guidelines"));
+$redirects[] = new Redirector(27, Array("0" => "documentation_list"));
+$redirects[] = new Redirector(2042, Array("0" => "privacy", "1" => "privacy.php"));
+$redirects[] = new Redirector(40, Array("0" => "indymedia_city_listing", "1" => "imcnetwork.php"));
+$redirects[] = new FilteredRedirector(41, Array("0" => "search", "1" => "full_archive_search", "2" => "advancedsearch.php"));
+$redirects[] = new Redirector(2041, Array("0" => "disclaimer", "1" => "disclaimer.php"));
+$redirects[] = new FilteredRedirector(50, Array("0" => "newswire", "1" => "newswire.php", "2" => "news", "3" => "universal_newswire", "4" => "news.php", "5" => "newswire.cgi"));
+$redirects[] = new ArticleRedirector(53, Array("0" => "article", "1" => "article_viewer", "2" => "newswire.php", "3" => "newswire.cgi"));
+$redirects[] = new FilteredRedirector(54, Array("0" => "features"));
+$redirects[] = new FilteredRedirector(55, Array("0" => "archives", "1" => "archives.php"));
+$redirects[] = new Redirector(24, Array("0" => "about_us", "1" => "aboutus.php", "2" => "about"));
+$redirects[] = new FilteredRedirector(56, Array("0" => "comments", "1" => "latestcomments.php", "2" => "latestcomments", "3" => "latest_comments"));
+$redirects[] = new FilteredRedirector(57, Array("0" => "publish", "1" => "publish.php", "2" => "publishcomments.php"));
+$redirects[] = new FilteredRedirector(58, Array("0" => "events", "1" => "events.php", "2" => "eventcalendar.php"));
+$redirects[] = new FilteredRedirector(64, Array("0" => "gallery", "1" => "gallery.php"));
+$redirects[] = new Redirector(67, Array("0" => "search_tools"));
+$redirects[] = new FilteredRedirector(1972, Array("0" => "anarkismo"));
+$redirects[] = new FilteredRedirector(84, Array("0" => "contact_us", "1" => "general_contact_form", "2" => "contact.php"));
+$redirects[] = new Redirector(2037, Array("0" => "getting_involved", "1" => "mailinglists.php"));
+$redirects[] = new Redirector(2031, Array("0" => "user_preferences"));
+$redirects[] = new FeedRedirector(2090, Array("0" => "atomfullposts", "1" => "atomfullposts.xml", "2" => "atomfullposts1.0", "3" => "atomfullposts1.0.xml"));
+$redirects[] = new FilteredRedirector(2093, Array("0" => "report_posts"));
+$redirects[] = new FeedRedirector(2096, Array("0" => "podcast", "1" => "podcast.xml"));
+$redirects[] = new FeedRedirector(2097, Array("0" => "rssfullposts", "1" => "rssfullposts.xml", "2" => "rssfullposts1.0", "3" => "rssfullposts1.0.xml"));
+$redirects[] = new FeedRedirector(2098, Array("0" => "atomsummaries", "1" => "atomsummaries.xml", "2" => "atomsummaries1.0", "3" => "atomsummaries1.0.xml", "4" => "atom", "5" => "atom.xml", "6" => "atom1.0", "7" => "atom1.0.xml"));
+$redirects[] = new FeedRedirector(2099, Array("0" => "imcglobalfeed", "1" => "imcglobalfeed.xml"));
+$redirects[] = new Redirector(2100, Array("0" => "feeds", "1" => "feeds.php"));
+$redirects[] = new Redirector(2108, Array("0" => "open_publishing", "1" => "openpublishing.php"));
+$redirects[] = new FilteredRedirector(2109, Array("0" => "imcglobal"));
+?>

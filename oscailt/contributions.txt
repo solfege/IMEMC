@@ -1,0 +1,23 @@
+Contributors to Oscailt
+
+Principal Authors
+
+Oscailt is a collective project of the technical group of Indymedia Ireland.
+Version 1 and 2 were written almost entirely by Vinnie.
+Some features in versions 2.0x were also written by Terry and Chekov.
+The new structure of Version 3 was designed by Chekov and written by Chekov and Vinnie, with contributions from Terry. 
+Version 3.1 was written by Terry, Chekov and Mike.
+Version 3.2 & 3.3 was written by Terry, Mike and nnumerous contributions and ideas from others using Oscailt.
+Version 3.4 was written by Terry and Wageslave and numerous contributions and ideas from others using Oscailt.
+
+We are proud to be able to contribute this software to the indymedia network and to the free software community.
+
+Incorporated Code
+
+Oscailt uses MagpieRSS for fetching and parsing feeds.
+The SQL Layer was initially based on the SQL layer in PHP Nuke, but has since changed substantially.
+Other than that, to the best of our knowledge, all code is 100% original.
+
+Other acknowledgements
+
+Indymedia Ireland have hosted oscailt's home page and development page. The International Indymedia Network provide oscailt's mailing list. Individuals from the imc-tech list have provided useful help in testing (thanks Alster, Alex and Tim) Individuals form the imc-communication list have provided much insight into the requirements of the network.more at: http://docs.indymedia.org/view/Devel/OscailtContributors

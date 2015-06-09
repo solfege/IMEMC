@@ -1,0 +1,929 @@
+/* These classes govern the main page layout for table-based pages          */
+/* They are also inherited by the objects in the menus and so on            */
+/* configuration pages and inherited by contained objects                   */
+
+
+div.indypage {
+	WIDTH: 100%;
+	MARGIN: 0px;
+	PADDING: 0;
+}
+
+div.indyheader {
+	MARGIN: 0 0 0 0;
+	PADDING: 0px;
+	clear: both;
+}
+
+table.indyheader{
+	WIDTH: 100%;
+	PADDING: 0px;
+	MARGIN: 0px 0px 0px 0px;
+	border-collapse: collapse;
+}
+
+tr.indyheader{
+	PADDING: 0px;
+	MARGIN: 0px;
+}
+
+td.indyheader{
+	WIDTH: 100%;
+	PADDING: 0px;
+	MARGIN: 0px;
+	vertical-align: bottom;
+	height: 100%;
+}
+
+th.indyheader{
+	WIDTH: 100%;
+	PADDING: 0px;
+	MARGIN: 0px;
+	vertical-align: bottom;
+	height: 100%;
+}
+
+/* bar rendered as a list and styled into a navigation bar */
+
+ul.indyheader{
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	background-color: #69796C;
+	color: White;
+	float: left;
+	width: 100%;
+	height: 100%;
+	vertical-align: bottom;
+	font-family: arial, helvetica, sans-serif;
+	display: inline;
+}
+
+li.indyheader
+{
+	display: inline;
+	text-decoration: none;
+	position: relative;
+	float: left;
+	padding: 2px 0 2px 0px;
+	list-style-type: none;
+
+}
+
+A.indyheader:link
+{
+	padding-bottom: 3px;
+	padding-top: 2px;
+	padding-right: 6px;
+	padding-left: 6px;
+	color: White;
+	font-size: 14px;
+	text-decoration: none;
+}
+
+a.indyheader:visited
+{
+	padding-bottom: 3px;
+	padding-top: 2px;
+	padding-right: 6px;
+	padding-left: 6px;	
+	font-size: 14px;
+	color: #fff;
+	text-decoration: none;
+}
+
+a.indyheader:active
+{
+	padding-bottom: 3px;
+	padding-top: 2px;
+	padding-right: 6px;
+	padding-left: 6px;	font-size: 14px;
+	text-decoration: none;
+}
+
+a.indyheader:hover 
+{
+	padding-bottom: 3px;
+	padding-top: 2px;
+	padding-right: 6px;
+	padding-left: 6px;	
+                      font-size: 14px;
+	background-color: #97B697;
+	color: #fff;
+	text-decoration: none;
+}
+
+
+/* these elements are overridden classes set to a specific class in the page configuration screen */
+li.header-icon
+{
+	display: inline;
+	text-decoration: none;
+	position: relative;
+	float: left;
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+}
+
+img.header-icon-thumbnail
+{
+	padding: 0px;
+	margin: 0px;
+	vertical-align: top;
+}
+
+INPUT.header-right
+{
+	background-color: #C8EDCE;
+	border: 0;
+	text-align: right;
+	vertical-align: middle;
+	width: 12em;
+	color: #4B675B;	
+	padding: 0.2em 0.4em 0em 0.4em;
+	font-size: 0.9em;
+	height: 1.4em;
+	margin-top: 1px;
+	margin-bottom: 1px;
+}
+
+
+input.header-right-image{
+	margin: 0px;
+	vertical-align: top;
+}
+
+li.header-right
+{
+	display: inline;
+	text-decoration: none;
+	position: relative;
+	float: right;
+	list-style-type: none;
+	background-color: #69796C;
+}
+
+/* simple classes to hold banners */
+table.banner-right
+{
+	clear: both;
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0;
+}
+
+tr.banner-right{}
+
+td.banner-right{
+	text-align: right;
+}
+
+table.banner-right-gallery{
+	float: right;
+	margin-right: 6px;
+}
+
+table.banner-left
+{
+	width: 100%;
+	border-collapse: collapse;
+	margin: -1px 0 0 -2px;
+	border: 0;
+}
+
+tr.banner-left{
+	border: 0;
+}
+
+td.banner-left{
+	text-align: left;
+	border: 0;
+}
+
+table.banner-left-gallery
+{
+       float: right;
+       margin-right: 4px;
+}
+
+table.banner-center
+{
+	text-align: center;
+	clear: both;
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0px 1px 1em 1px;
+   background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	padding: 4px;
+}
+
+tr.banner-center{}
+td.banner-center{
+	text-align: center;
+}
+
+
+/*  The table cell to hold the main page body */
+
+table.indypagebody{
+	BACKGROUND-COLOR: #ffffff;
+	MARGIN: -4px 0 0 0px;	
+	BORDER: 0px;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+tr.indypagebody{}
+
+td.indypagebody{
+	MARGIN: 0px 200px 0px 0px;
+	PADDING: 20px 20px 4% 20px;
+	VERTICAL-ALIGN: TOP;
+	BACKGROUND-COLOR: #ffffff;
+}
+
+/* this is an example of a column. If you want to make your own styled columns */
+/* You will probably need to implement most of these html elements             */
+
+td.indyleftcolumn {
+	WIDTH: 133px;	
+	BACKGROUND-COLOR: #97B697;
+	VERTICAL-ALIGN: TOP;
+	PADDING: 0.5em 0em 0.5em 0em;
+}
+
+.indyleftcolumn
+{
+	COLOR: #fff; 
+}
+
+.indyleftcolumn-alternative
+{
+	COLOR: #fff; 
+}
+
+div.indyleftcolumn
+{
+	MARGIN: 0;
+	padding: 0px 4px 10px 8px;
+	border-bottom: #619D55 2px double;
+}
+
+ul.indyleftcolumn{
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+li.indyleftcolumn{
+	font-size: 1.2em;
+	padding: 2px;
+}
+
+H5.indyleftcolumn{
+	margin-top: 5px;
+	margin-bottom: 0px;
+}
+
+H4.indyleftcolumn{
+	margin-top: 8px;
+	margin-bottom: 0px;
+}
+
+H3.indyleftcolumn{
+	margin-top: 10px;
+	margin-bottom: 4px;
+}
+
+H2.indyleftcolumn{
+	margin-top: 14px;
+	margin-bottom: 10px;
+}
+
+H1.indyleftcolumn{
+	margin-top: 18px;
+	margin-bottom: 10px;
+}
+
+
+A.indyleftcolumn:link {
+	COLOR: #fff; 
+	TEXT-DECORATION: none
+}
+
+A.indyleftcolumn:visited {
+	COLOR: #fff; 
+	TEXT-DECORATION: none
+}
+
+A.indyleftcolumn:hover {
+	COLOR: #fff; 
+	TEXT-DECORATION: underline;
+}
+
+A.indyleftcolumn:active {
+	COLOR: #fff; 
+	TEXT-DECORATION: none
+}
+
+A.indyleftcolumn-alternative:link {
+	COLOR: #fff; 
+	TEXT-DECORATION: none
+}
+
+A.indyleftcolumn-alternative:visited {
+	COLOR: #fff; 
+	TEXT-DECORATION: none
+}
+
+A.indyleftcolumn-alternative:hover {
+	COLOR: #fff; 
+	TEXT-DECORATION: underline;
+}
+
+A.indyleftcolumn-alternative:active {
+	COLOR: #fff; 
+	TEXT-DECORATION: none
+}
+
+P.indyleftcolumn {}
+
+/* some special classes that are composed from the column class */
+P.indyleftcolumn-date {
+	text-align: center;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+P.indyleftcolumn-context {
+	text-align: center;
+	margin-top: 2px;
+	margin-bottom: 2px;
+	font-size: 0.8em;
+}
+
+p.indyleftcolumn-icons {
+	text-align: center;
+	margin-top: 0px;
+	margin-bottom: 2px;
+}
+
+.indyleftcolumndate{
+	font-size: 0.9em;
+}
+
+.indyleftcolumncomments{
+	font-size: 0.85em;
+	font-style: italic;
+}
+
+.indyleftcolumnauthor{
+	font-size: 0.85em;
+	font-style: italic;
+}
+
+.indyleftcolumnorganisation{
+	font-size: 0.85em;
+}
+
+.indyleftcolumn-alternativedate{
+	font-size: 0.9em;
+}
+
+.indyleftcolumn-alternativecomments{
+	font-size: 0.85em;
+	font-style: italic;
+}
+
+.indyleftcolumn-alternativeauthor{
+	font-size: 0.85em;
+	font-style: italic;
+}
+
+.indyleftcolumn-alternativeorganisation{
+	font-size: 0.85em;
+}
+
+div.indyleftcolumn-thumbnail{
+	margin-top: 4px;
+}
+
+img.indyleftcolumn-thumbnail{
+	border: 0;
+}
+
+span.indyleftcolumn-readmore
+{
+	margin-top: -1em;
+	font-size: 0.85em;
+	float: right;
+}
+select.indyleftcolumn
+{
+ 	background-color: #D8E6E6;
+	color: #000;
+	width: 110px;
+	font-size: 0.9em;
+	margin: 0.5em 0 0.2em 0;
+}
+
+input.indyleftcolumn
+{
+   font-size: 0.9em;
+   color: #3B5A3B; 
+	width: 110px; 
+}
+
+p.feeds
+{
+    margin: 0;
+    padding: 0;
+}
+
+div.feeds
+{
+	margin: 0;
+	padding: 0px 4px 10px 8px;
+        border-bottom: #619d55 2px double;
+}
+
+h4.feeds
+{
+	margin: 8px auto 4px auto;
+}
+
+a.feeds:link {
+	color: #fff; 
+	text-decoration: none
+}
+
+a.feeds:visited {
+	color: #fff; 
+	text-decoration: none
+}
+
+a.feeds:hover {
+	color: #fff; 
+	text-decoration: underline;
+}
+
+a.feeds:active {
+	color: #fff; 
+	text-decoration: none
+}
+
+
+/* A second column with similar classes */
+
+.indyrightcolumn{
+	COLOR: #3B5A3B; 
+}
+
+td.indyrightcolumn{
+	WIDTH: 170px;	
+	BACKGROUND-COLOR: #97B697;
+	VERTICAL-ALIGN: TOP;
+	PADDING: 0em 0em 0.5em 0em;		
+}
+
+div.indyrightcolumn
+{
+	MARGIN: 0;
+	padding: 0px 4px 10px 10px;
+}
+
+ul.indyrightcolumn{
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+li.indyrightcolumn{
+	font-size: 1.2em;
+	padding: 2px;
+}
+
+H5.indyrightcolumn{
+	margin-top: 5px;
+	margin-bottom: 0px;
+}
+
+H4.indyrightcolumn{
+	margin-top: 8px;
+	margin-bottom: 0px;
+}
+
+H3.indyrightcolumn{
+	margin-top: 10px;
+	margin-bottom: 4px;
+}
+
+H4.indyrightcolumn{
+	margin-top: 8px;
+	margin-bottom: 0px;
+	text-align: center;
+}
+
+H1.indyrightcolumn{
+	margin-top: 18px;
+	margin-bottom: 10px;
+}
+
+A.indyrightcolumn:link {
+	COLOR: #1B3A1B; 
+	TEXT-DECORATION: none
+}
+
+A.indyrightcolumn:visited {
+	COLOR: #1B3A1B; 
+	TEXT-DECORATION: none
+}
+
+A.indyrightcolumn:hover {
+	COLOR: #1B3A1B; 
+	TEXT-DECORATION: underline;
+}
+
+A.indyrightcolumn:active {
+	COLOR: #1B3A1B; 
+	TEXT-DECORATION: none
+}
+
+A.indyrightcolumn-alternative:link {
+	COLOR: #1B3A1B; 
+	TEXT-DECORATION: none
+}
+
+A.indyrightcolumn-alternative:visited {
+	COLOR: #1B3A1B; 
+	TEXT-DECORATION: none
+}
+
+A.indyrightcolumn-alternative:hover {
+	COLOR: #1B3A1B; 
+	TEXT-DECORATION: underline;
+}
+
+A.indyrightcolumn-alternative:active {
+	COLOR: #1B3A1B; 
+	TEXT-DECORATION: none
+}
+
+
+P.indyrightcolumn {}
+P.indyrightcolumn-alternative {}
+
+/* classes of data at the top of news feeds */
+P.indyrightcolumn-date {
+	text-align: center;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+P.indyrightcolumn-context {
+	text-align: center;
+	margin-top: 2px;
+	margin-bottom: 2px;
+	font-size: 0.8em;
+}
+
+p.indyrightcolumn-icons {
+	text-align: center;
+	margin-top: 0px;
+	margin-bottom: 2px;
+}
+
+span.indyrightcolumn-readmore
+{
+	margin-top: -1em;
+	font-size: 0.85em;
+	float: right;
+}
+
+/* classes for headlines in newsfeeds */
+.indyrightcolumnauthor {
+	font-size: 0.85em;
+	font-style: italic;
+}
+
+.indyrightcolumndate {
+	font-size: 0.9em;
+}
+
+.indyrightcolumncomments {
+	font-size: 0.85em;
+	font-style: italic;
+}
+
+.indyrightcolumnorganisation {
+	font-size: 0.85em;
+}
+
+.indyrightcolumn-alternativeauthor {
+	font-size: 0.85em;
+	font-style: italic;
+}
+
+.indyrightcolumn-alternativedate {
+	font-size: 0.9em;
+}
+
+.indyrightcolumn-alternativecomments {
+	font-size: 0.85em;
+	font-style: italic;
+}
+
+.indyrightcolumn-alternativeorganisation {
+	font-size: 0.85em;
+}
+
+div.indyrightcolumn-thumbnail{
+	margin-top: 4px;
+}
+
+img.indyrightcolumn-thumbnail {
+	border: 0;
+}
+
+/* these are over-ridden elements in the menus - set by specifying a particular class on the menu configuration screen for this element */
+
+div.indyright-filter {
+	background-color: #859B77;	
+	margin-top: 0px;
+	padding: 6px 4px 6px 4px;
+	border-bottom: #FFFFFF 2px double;
+	border-top: #FFFFFF 2px double;
+	text-align: center;
+}
+
+span.indyright-filter {
+	color: #fff;
+	font-weight: bold;
+	margin-right: 40px;
+}
+
+p.indyright-filter {
+	margin: 0px;
+	padding-left: 10px;
+	text-align: left;
+}
+
+.indyright-filterbuttonimage {
+	vertical-align: bottom;
+}
+
+select.indyright-filter {
+	background-color: #D8E6E6;
+	color: #000;
+	width: 150px;
+	margin: 2px 0px 2px 0px;
+}
+
+
+/* A second over-ridden element */
+.indyright-inset
+{
+	COLOR: #3B5A3B; 
+}
+
+div.indyright-inset {
+	background-color: #88C687;	
+	margin-top: 0px;
+	padding: 10px 4px 16px 4px;
+	border-bottom: #FFFFFF 2px double;
+	border-top: #FFFFFF 2px double;
+}
+
+ul.indyright-inset{
+	padding: 4px;
+	margin: 0;
+	list-style-type: none;
+
+}
+
+li.indyright-inset{
+	border-top: #D8E6E6 1px solid;
+	padding: 4px 0 4px 0;
+	font-size: 1.1em;
+}
+
+select.indyright-inset {
+	background-color: #D8E6E6;
+}
+
+input.indyright-inset
+{
+   font-size: 0.9em;
+   color: #3B5A3B; 
+	width: 110px; 
+	margin-top: 2px;
+}
+
+A.indyright-inset:link {
+	COLOR: #3B5A3B; 
+	TEXT-DECORATION: none
+}
+
+A.indyright-inset:visited {
+	COLOR: #3B5A3B; 
+	TEXT-DECORATION: none
+}
+
+A.indyright-inset:hover {
+	COLOR: #3B5A3B; 
+	TEXT-DECORATION: underline;
+}
+
+A.indyright-inset:active {
+	COLOR: #3B5A3B; 
+	TEXT-DECORATION: none
+}
+
+H4.indyright-inset {
+	margin: 4px 0 4px 0;
+	text-align: center;
+}
+
+/* A totally plain column */
+
+
+td.plaincolumn {
+	vertical-align: top;
+	padding: 5px;
+}
+
+/* footer classes */
+
+div.indyfooter {
+	WIDTH: 100%;
+	MARGIN: 0px 0px 0px 0px;
+	PADDING: 0px;
+	clear: both;
+}
+
+table.indyfooter {
+	WIDTH: 100%;
+	PADDING: 0px;
+	MARGIN: 0px;
+	BORDER: 0px;
+	border-collapse: collapse;
+}
+
+tr.indyfooter {
+	WIDTH: 100%;
+	PADDING: 0px;
+	MARGIN: 0px;
+}
+
+td.indyfooter {
+	border-top: #97B697 1px solid;
+	PADDING-left: 0.5em;
+	PADDING-right: 0.5em;
+	FONT-SIZE: 0.9em;
+	MARGIN: 0px;
+	vertical-align: middle;
+}
+
+/* inset box classes */
+div.documentation-box{
+	float: right;
+	width: 142px;
+	position: relative;
+        top: -20px;
+        right: -20px;
+        background-color: #97b697;
+        clear: right;
+        padding-bottom: 1em;
+}
+
+h4.documentation-box{
+	margin-top: 1em;
+	margin-bottom: 4px;
+	text-align: center;
+   padding: 0px 6px 0px 6px;
+}
+
+p.documentation-box{
+   padding: 0px 6px 0px 6px;
+   margin: 0;
+}
+
+a.documentation-box:link {
+	color: #0b2a0b; 
+	text-decoration: none
+}
+
+a.documentation-box:visited {
+	color: #0b2a0b; 
+	text-decoration: none
+}
+
+a.documentation-box:hover {
+	color: #0b2a0b; 
+	text-decoration: underline;
+}
+
+a.documentation-box:active {
+	color: #0b2a0b; 
+	text-decoration: none
+}
+
+/* inset box classes */
+div.indy-insetbox {
+	float: right;
+	width: 200px;
+	position: relative;
+	margin: 30px 0px 8px 4px;
+	background-color: #E8F6E8;
+	border: #B8f8B8 2px solid;
+	clear: right;
+	padding: 4px;
+}
+
+P.indy-insetbox{
+	font-size: 0.85em;
+}
+
+span.indy-insetboxcomments
+{
+	font-style: italic;
+}
+
+A.indy-insetbox:link {
+	COLOR: #69796C;
+	TEXT-DECORATION: none
+}
+
+A.indy-insetbox:visited {
+	COLOR: #69796C;
+	TEXT-DECORATION: none
+}
+
+A.indy-insetbox:hover {
+	COLOR: #69796C;
+	TEXT-DECORATION: underline;
+}
+
+A.indy-insetbox:active {
+	COLOR: #69796C;
+	TEXT-DECORATION: none
+}
+
+
+/* some div-based pages here */
+/* this should work for an 800px width pure css based page layout - nice */
+
+div.indypagediv {
+	WIDTH: 800px;
+	PADDING: 0 0 0 0;
+	margin-left: auto;
+   margin-right: auto;
+  	HEIGHT: 100%;
+  	border: #B8f8B8 2px solid;
+}
+
+div.indypagediv-body {
+	PADDING: 0 0 0 0;
+ 	margin-left: auto;
+ 	margin-right: auto; 	
+ 	margin-top: 20px;
+	background-color: #fff;
+	line-height: 130%;
+	height: 100%;
+}
+
+div.indymainpanediv { 
+	PADDING: 0 20px 0 20px;
+ 	margin-left: 140px;
+ 	margin-right: 160px;
+ 	background-color: #fff;
+	line-height: 130%;
+	height: 100%;
+}
+
+
+div.indyrightdiv {
+	WIDTH: 150px;	
+	BACKGROUND-COLOR: #97B697;
+ 	float: right;
+	margin: 0;
+	padding: 0.5em;
+	height: 100%;
+}
+
+div.indypagecontents {
+	BACKGROUND-COLOR: #FFF;
+	height: 100%;
+	margin-left: 120px;
+	margin-right: 140px;
+	PADDING: 0.5em 5em 0.5em 5em;
+}
+
+div.indyleftdiv{
+	BACKGROUND-COLOR: #97B697;
+	WIDTH: 130px;
+   float: left;
+   PADDING: 0.5em 0.2em 0.5em 0.4em;
+	height: 100%;
+}
